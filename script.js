@@ -42,7 +42,7 @@ function prepareDownloadLink() {
   if (input.files[0]) {
     dlLink.setAttribute(
       'download',
-input.files[0].name.replace(/[^\\\/]*$/, 'avatar-amigoindica.png')
+input.files[0].name.replace(/[^\\\/]*$/, 'twibbon.png')
     );
   }
   dlLink.hidden = false;
