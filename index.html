@@ -59,12 +59,14 @@ width: auto;
 </head>
 <body>
 <main>
-<h1>Example Domain</h1>
-<p>This domain is for use in illustrative examples in
-documents. You may use this domain in literature without prior
-coordination or asking for permission.</p>
-<p><a href="https://www.iana.org/domains/example">More
-information...</a></p>
+<h1>Twibbon Generator</h1>
+<label class="action">
+<input type="file" id="input-file" accept="image/*">
+PILIH FOTO
+</label>
+<p><canvas id="preview" width="500" height="500" title="Preview"></canvas></p>
+<p><a download="framed-avatar.png" class="action" id="download-link" href="">SALVAR AVATAR</a></p>
+<p><img src="placeholder.png" alt="" width="1" id="placeholder" hidden></p>
 </main>
 <script src="script.js"></script>
 </body>
