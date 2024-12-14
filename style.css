@@ -1,0 +1,53 @@
+body {
+background-color: #f0f0f2;
+margin: 0;
+padding: 0;
+font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;     
+}
+main {
+width: 600px;
+margin: 5em auto;
+padding: 2em;
+background-color: #fdfdff;
+border-radius: 0.5em;
+box-shadow: 2px 3px 7px 2px rgba(0,0,0,0.02);
+}
+a:link, a:visited {
+text-decoration: none;
+}
+img, canvas {
+width: 100%;
+height: auto;
+}
+#input-file {
+position: absolute;
+left: -10000px;
+}
+.action {
+font-size: 14px;
+text-decoration: none;
+cursor: pointer;
+color: #149AFF;
+margin: 0 0 16px 0;
+padding: 10px 20px;
+border-radius: 50px;
+border: 2px solid;
+display: block;
+text-align: center;
+}
+.action[href=''] {
+display: none;
+}
+#download-link {
+background-color: #149AFF !important;
+border: none !important;
+color: white !important;
+margin: 16px 0 0 0 !important;
+padding: 16px !important;
+}
+@media (max-width: 700px) {
+main {
+margin: 0 auto;
+width: auto;
+}
+}
