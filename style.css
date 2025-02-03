@@ -24,7 +24,6 @@ position: absolute;
 left: -10000px;
 }
 .action {
-width: 48%;
 font-size: 14px;
 text-decoration: none;
 cursor: pointer;
@@ -40,7 +39,6 @@ text-align: center;
 display: none;
 }
 #download-link {
-width: 48%;
 background-color: #149AFF !important;
 border: none !important;
 color: white !important;
