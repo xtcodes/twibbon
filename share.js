@@ -1,7 +1,7 @@
 let shareData = {
         title: 'Twibbon',
-        text: 'Learn web development on MDN!',
-        url: 'https://developer.mozilla.org',
+        text: 'This is a website where you can add photos to frames.',
+        url: 'https://xtcodes.github.io/twibbon/',
       };
 
       const btn = document.querySelector('button');
@@ -18,7 +18,7 @@ let shareData = {
         }
         navigator.share(shareData)
           .then(() =>
-            resultPara.textContent = 'MDN shared successfully'
+            resultPara.textContent = 'Twibbon shared successfully'
           )
           .catch((e) =>
             resultPara.textContent = 'Error: ' + e
