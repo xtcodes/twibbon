@@ -24,26 +24,21 @@ position: absolute;
 left: -10000px;
 }
 .action {
-font-size: 14px;
-text-decoration: none;
-cursor: pointer;
-color: #149AFF;
-border-radius: 4px;
-margin: 4px 2px;
+background-color: #e7e7e7; /* Gray */
+border: none;
+color: white;
 padding: 15px 32px;
-border: 2px solid;
-display: inline-block;
 text-align: center;
+text-decoration: none;
+display: inline-block;
+font-size: 16px;
 }
 .action[href=''] {
 display: none;
 }
 #download-link {
 background-color: #149AFF !important;
-border: none !important;
 color: white !important;
-margin: 4px 2px !important;
-padding: 15px 32px !important;
 }
 @media (max-width: 700px) {
 main {
