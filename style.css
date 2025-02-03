@@ -23,7 +23,7 @@ height: auto;
 position: absolute;
 left: -10000px;
 }
-.action, #download-link {
+.action {
 font-size: 14px;
 text-decoration: none;
 cursor: pointer;
@@ -37,6 +37,13 @@ text-align: center;
 }
 .action[href=''] {
 display: none;
+}
+#download-link {
+background-color: #149AFF !important;
+border: none !important;
+color: white !important;
+margin: 4px 2px !important;
+padding: 15px 32px !important;
 }
 @media (max-width: 700px) {
 main {
