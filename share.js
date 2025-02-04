@@ -1,26 +1,22 @@
-let shareData = {
-        title: 'Twibbon',
-        text: 'This is a website where you can add photos to frames.',
-        url: 'https://xtcodes.github.io/twibbon/',
-      };
-
-      const btn = document.querySelector('button');
-      const resultPara = document.querySelector('.result');
-
-      btn.addEventListener('click', () => {
-        if (!navigator.canShare) {
-          resultPara.textContent = 'Web Share API not available';
-          return;
-        }
-        if (!navigator.canShare(shareData)) {
-          resultPara.textContent = 'Share data unsupported, disallowed, or invalid';
-          return;
-        }
-        navigator.share(shareData)
-          .then(() =>
-            resultPara.textContent = 'Twibbon shared successfully'
-          )
-          .catch((e) =>
-            resultPara.textContent = 'Error: Share canceled'
-          )
-      });
+async function shareCanvas() {
+  const canvasElement = document.getElementById('canvas');
+  const dataUrl = canvasElement.toDataURL();
+  const blob = await (await fetch(dataUrl)).blob();
+  const filesArray = [
+    new File(
+      [blob],
+      'image.png',
+      {
+        type: blob.type,
+        lastModified: new Date().getTime()
+      }
+    )
+  ];
+  const shareData = {
+    files: filesArray,
+    title: "Twibbon Aplikasi",
+    text: "Twibbon adalah cara sederhana untuk mengekspresikan dukungan dan partisipasi kita dalam suatu acara atau gerakan.",
+    url: "https://xtcodes.github.io/twibbon/",
+  };
+  navigator.share(shareData);
+}
