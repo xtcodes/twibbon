@@ -1,5 +1,5 @@
 async function shareCanvas() {
-  const canvasElement = document.getElementById('canvas');
+  const canvasElement = document.getElementById('preview');
   const dataUrl = canvasElement.toDataURL();
   const blob = await (await fetch(dataUrl)).blob();
   const filesArray = [
