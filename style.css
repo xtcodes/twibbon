@@ -40,7 +40,7 @@ cursor: pointer;
 display: none;
 }
 #download-link {
-background-color: #149AFF !important;
+background-color: #008CBA !important;
 color: white !important;
 }
 @media (max-width: 700px) {
