@@ -9,9 +9,9 @@ fetch(dataUrl)
 const filesArray = [new File([blob], 'image.png', { type: blob.type, lastModified: new Date().getTime() })];
 console.log(filesArray);
 const shareData = {
-title: "FREE AND SIMPLE PFP GENERATOR",
-text: "FREE AND SIMPLE PFP GENERATOR",
-url: "https://badut.pages.dev/",
+title: "Twibbon Generator",
+text: "This is a website where you can add photos to frames.",
+url: "https://xtcodes.github.io/twibbon/",
 files: filesArray
 };
 console.log(shareData);
