@@ -11,8 +11,8 @@
 			"done": "Selesai!"
 		}, 
 		"buttons": {
-			"download": "Unduh Gambar!", 
-			"newImage": "Buat foto profil baru."
+			"download": "Download", 
+			"newImage": "Reset"
 		}
 	}
 }
