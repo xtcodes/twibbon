@@ -3,121 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twibbon Generator Pro</title>
+    <title>Twibbon Generator Pro - Buat Foto Profil Keren</title>
     <style>
         :root {
             --primary: #4a90e2;
             --success: #2ecc71;
-            --danger: #e74c3c;
-            --bg: #f0f2f5;
+            --bg: #f8f9fa;
+            --text: #2d3436;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px; /* Biar gak rapat layar di HP */
-            box-sizing: border-box;
+            color: var(--text);
+            line-height: 1.6;
         }
 
-        #app {
+        /* Container Utama */
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Bagian Generator */
+        .generator-card {
             background: white;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
             text-align: center;
-            width: 100%;
-            max-width: 450px; /* Ukuran pas untuk widget */
+            margin-bottom: 40px;
         }
 
-        /* DROP AREA 1:1 */
+        h1 { font-size: 1.8rem; margin-bottom: 10px; color: var(--primary); }
+
+        /* DROP AREA 1x1 PRESISI */
         .drop-area {
             width: 100%;
-            aspect-ratio: 1 / 1; /* Kotak Sempurna */
-            border: 2px dashed #ccc;
-            border-radius: 15px;
+            max-width: 350px; /* Ukuran maksimal di desktop */
+            aspect-ratio: 1 / 1; /* Ini kunci 1x1-nya */
+            margin: 20px auto;
+            border: 3px dashed #dfe6e9;
+            border-radius: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #fafafa;
-            margin-bottom: 20px;
-            overflow: hidden;
+            background: #fcfcfc;
             position: relative;
+            overflow: hidden;
         }
 
-        .drop-area.active {
+        .drop-area:hover, .drop-area.active {
             border-color: var(--primary);
-            background: rgba(74, 144, 226, 0.05);
+            background: #f0f7ff;
         }
 
-        .drop-area:hover {
-            border-color: #999;
-        }
-
-        .drop-area p {
-            font-size: 0.9rem;
-            color: #777;
-            margin: 10px 20px;
-        }
-
-        /* Icon sederhana */
-        .upload-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        /* Output Image & Canvas */
-        #app img, #app canvas {
+        .drop-area img {
             width: 100%;
-            height: auto;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-            border-radius: 12px;
-            display: block;
-            margin-bottom: 20px;
+            height: 100%;
+            object-fit: cover; /* Biar preview nggak gepeng */
         }
 
-        /* Button Styling */
+        /* Tombol & Status */
+        .status-text { font-size: 0.9rem; color: #636e72; margin-bottom: 15px; }
+        
         .button-group {
             display: flex;
-            gap: 12px;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
         }
 
         button {
-            flex: 1;
-            padding: 12px;
+            padding: 12px 25px;
             border: none;
-            border-radius: 10px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
+            transition: transform 0.2s;
         }
 
-        button:active { transform: scale(0.98); }
+        .btn-download { background: var(--success); color: white; flex: 2; }
+        .btn-reset { background: #dfe6e9; color: #636e72; flex: 1; }
+        button:hover { transform: translateY(-2px); opacity: 0.9; }
 
-        .btn-download { background: var(--success); color: white; }
-        .btn-reset { background: #eee; color: #444; }
+        /* BAGIAN ARTIKEL (Biar gak garing) */
+        .article-section {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
 
-        input[type="file"] { display: none; } /* Sembunyikan input asli */
-
-        .status-msg {
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-            color: #555;
+        .article-section h2 { border-bottom: 3px solid var(--primary); display: inline-block; padding-bottom: 5px; }
+        .article-section p { margin-bottom: 15px; color: #4b4b4b; }
+        
+        @media (max-width: 600px) {
+            .container { margin: 10px auto; }
+            .generator-card, .article-section { padding: 20px; border-radius: 0; }
         }
     </style>
 </head>
 <body>
-    <div id="app">
+
+    <div class="container">
+        <div id="app" class="generator-card">
+            </div>
+
+        <div class="article-section">
+            <h2>Cara Menggunakan Twibbon</h2>
+            <p>Twibbon adalah cara termudah untuk memberikan dukungan pada kampanye atau acara tertentu secara visual di media sosial. Dengan generator kami, Anda tidak perlu lagi menggunakan aplikasi edit foto yang rumit.</p>
+            
+            <h3>Langkah-langkah:</h3>
+            <ul>
+                <li><strong>Unggah Foto:</strong> Klik area kotak di atas atau seret foto profil terbaik Anda.</li>
+                <li><strong>Proses Otomatis:</strong> Sistem kami akan memotong foto Anda secara proporsional agar pas di tengah twibbon.</li>
+                <li><strong>Unduh & Bagikan:</strong> Klik tombol unduh dan foto Anda siap diunggah ke Instagram, WhatsApp, atau Facebook.</li>
+            </ul>
+
+            <h3>Kenapa Memilih Kami?</h3>
+            <p>Layanan kami sepenuhnya gratis dan diproses secara lokal di browser Anda, yang berarti foto Anda tidak akan pernah dikirim ke server kami—menjaga privasi Anda 100% aman.</p>
         </div>
+    </div>
+
     <script src="src/js/index.js"></script>
     <script src="src/js/app.js"></script>
 </body>
-	</html>
+</html>
