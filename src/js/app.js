@@ -19,104 +19,101 @@ addEventListener('load', function() {
 });
 
 function generateElements() {
-    // 1. Bersihkan struktur DOM utama
+    // 1. Ambil Root Element
     var mainElement = document.getElementById(config.rootElementId);
     mainElement.innerHTML = "";
     
-    // 2. Status Element
+    // 2. Status Text
     let statusElement = document.createElement('p');
     statusElement.className = 'status-text';
     statusElement.textContent = config.messages.status.startup;
     mainElement.appendChild(statusElement);
 
-    // 3. Container Drop Area 1x1 (Biar Responsive & Gak Luber)
-    let canvasContainer = document.createElement('div');
-    canvasContainer.className = 'canvas-container';
-    canvasContainer.innerHTML = '<span>Klik atau Seret Foto Profil ke Sini</span>';
-    mainElement.appendChild(canvasContainer);
+    // 3. Drop Area Square 1:1
+    let dropArea = document.createElement('div');
+    dropArea.className = 'drop-area-square';
+    dropArea.innerHTML = `
+        <div class="drop-content">
+            <span class="icon">📸</span>
+            <span class="label">Klik atau Seret Foto Ke Sini</span>
+        </div>
+    `;
+    mainElement.appendChild(dropArea);
 
-    // 4. Input file (Hidden)
+    // 4. Input File Tersembunyi
     let fileUploadElement = document.createElement('input');
     fileUploadElement.type = 'file';
     fileUploadElement.accept = 'image/*';
     fileUploadElement.style.display = 'none'; 
     mainElement.appendChild(fileUploadElement);
     
-    // 5. Overlay Image (Twibbon)
+    // 5. Preload Overlay (Twibbon)
     let overlayImageElement = new Image();
     overlayImageElement.src = config.overlaySource;
     overlayImageElement.style.display = 'none';
     mainElement.appendChild(overlayImageElement);
 
-    // --- INTERAKSI ---
+    // --- LOGIKA INTERAKSI ---
 
-    // Klik kotak untuk pilih file
-    canvasContainer.onclick = () => fileUploadElement.click();
+    dropArea.onclick = () => fileUploadElement.click();
 
-    // Drag & Drop visual effect
     ['dragenter', 'dragover'].forEach(name => {
-        canvasContainer.addEventListener(name, (e) => {
+        dropArea.addEventListener(name, (e) => {
             e.preventDefault();
-            canvasContainer.classList.add('active');
+            dropArea.classList.add('active');
         });
     });
     ['dragleave', 'drop'].forEach(name => {
-        canvasContainer.addEventListener(name, (e) => {
+        dropArea.addEventListener(name, (e) => {
             e.preventDefault();
-            canvasContainer.classList.remove('active');
+            dropArea.classList.remove('active');
         });
     });
 
-    // Handle File dari Drop
-    canvasContainer.addEventListener('drop', (e) => {
+    dropArea.addEventListener('drop', (e) => {
         const files = e.dataTransfer.files;
-        if(files.length) {
-            processImage(files[0]);
-        }
+        if(files.length) processImage(files[0]);
     });
 
-    // Handle File dari Input Klik
     fileUploadElement.addEventListener('change', function() {
-        if(this.files && this.files[0]) {
-            processImage(this.files[0]);
-        }
+        if(this.files && this.files[0]) processImage(this.files[0]);
     });
 
-    // 6. Fungsi Pemrosesan Gambar
     function processImage(file) {
         statusElement.textContent = config.messages.status.uploading;
         
         let uploadedImage = document.createElement('img');
         uploadedImage.src = URL.createObjectURL(file);
         
-        uploadedImage.addEventListener('load', function() {
+        uploadedImage.onload = function() {
             statusElement.textContent = config.messages.status.processing;
             
-            // Setup generator berdasarkan ukuran twibbon asli
+            // Setup Generator dengan resolusi asli twibbon
             let setupOptions = {
                 width: overlayImageElement.width,
                 height: overlayImageElement.height
             }
             const generator = new Generator(setupOptions);
             
-            // Tambahkan layer (Gunakan class Generator dengan logic sX, sY untuk crop)
+            // Render Layer (Logic Auto-Crop)
             generator.addLayer(uploadedImage); 
             generator.addLayer(overlayImageElement, { isOverlay: true });
             
-            // Bersihkan tampilan kotak untuk hasil
-            canvasContainer.innerHTML = "";
-            canvasContainer.style.border = "none";
-            
-            // Tampilkan hasil preview (Responsive 100% dari container)
+            // Render ke Data URL
             let resultData = generator.render();
+
+            // UPDATE UI: Ganti isi drop area dengan hasil
+            dropArea.innerHTML = "";
+            dropArea.style.border = "none";
+            
             let finalPreview = document.createElement('img');
             finalPreview.src = resultData;
-            finalPreview.className = 'result-preview';
-            canvasContainer.appendChild(finalPreview);
+            finalPreview.className = 'preview-img';
+            dropArea.appendChild(finalPreview);
 
             statusElement.textContent = config.messages.status.done;
 
-            // 7. Tombol Berdampingan
+            // Tombol Kontrol
             let buttonContainer = document.createElement('div');
             buttonContainer.className = 'button-group';
             
@@ -140,6 +137,6 @@ function generateElements() {
             buttonContainer.appendChild(downloadButtonElement);
             buttonContainer.appendChild(renewFormElement);
             mainElement.appendChild(buttonContainer);
-        });
+        };
     }
 }
