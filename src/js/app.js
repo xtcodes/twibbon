@@ -1,125 +1,102 @@
 let config;
 
 addEventListener('load', function() {  
-    const request = new Request('config/config.json');
-  
-    fetch(request)
-        .then(response => {
-            if(response.status == 200) {
-                return response.json();
-            } else {
-                throw new Error("Could not fetch config from server!");
-            }
-        }).then(json => {
+    fetch('config/config.json')
+        .then(res => res.json())
+        .then(json => {
             config = json;
-            generateElements();
-        }).catch(error => {
-            console.error(error);
+            initApp();
         });
 });
 
-function generateElements() {
-    // 1. Bersihkan Root (Reset ke Beranda)
-    var mainElement = document.getElementById(config.rootElementId);
-    mainElement.innerHTML = "";
-    
-    // 2. Status Tampilan Awal
-    let statusElement = document.createElement('div');
-    statusElement.className = 'status-msg';
-    statusElement.id = 'status-display';
-    statusElement.textContent = config.messages.status.startup;
-    mainElement.appendChild(statusElement);
+function initApp() {
+    const container = document.getElementById('dynamic-content');
+    container.innerHTML = "";
 
-    // 3. Drop Area 1x1 Kotak Sempurna
-    let dropArea = document.createElement('div');
+    // 1. Drop Area
+    const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
+    
+    // Status Teks di Tengah (Startup)
     dropArea.innerHTML = `
-        <div class="placeholder-content">
+        <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
-            <span>Klik atau Seret Foto</span>
+            <span>${config.messages.status.startup}</span>
         </div>
     `;
-    mainElement.appendChild(dropArea);
+    container.appendChild(dropArea);
 
-    // 4. Input File Tersembunyi
-    let fileInput = document.createElement('input');
+    // 2. Input File
+    const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
-    fileInput.id = 'user-file-input';
-    fileInput.style.display = 'none'; 
-    mainElement.appendChild(fileInput);
-    
-    // 5. Kontainer Tombol (Kosong di awal)
-    let btnGroup = document.createElement('div');
-    btnGroup.className = 'btn-group';
-    btnGroup.id = 'btn-group-ui';
-    btnGroup.style.display = 'none';
-    mainElement.appendChild(btnGroup);
+    fileInput.style.display = 'none';
+    container.appendChild(fileInput);
 
-    // Render Icon Lucide
+    // 3. Button Group (Sembunyi dulu)
+    const btnGroup = document.createElement('div');
+    btnGroup.className = 'btn-group';
+    btnGroup.id = 'ui-group';
+    btnGroup.style.display = 'none';
+    container.appendChild(btnGroup);
+
     lucide.createIcons();
 
-    // Event Klik Box
     dropArea.onclick = () => fileInput.click();
 
-    fileInput.addEventListener('change', function() {
+    fileInput.onchange = function() {
         if(this.files && this.files[0]) processImage(this.files[0]);
-    });
+    };
 
     function processImage(file) {
-        const statusDisplay = document.getElementById('status-display');
+        const statusUI = document.getElementById('status-ui');
+        const uiGroup = document.getElementById('ui-group');
         const zone = document.getElementById('drop-zone');
-        const uiGroup = document.getElementById('btn-group-ui');
 
-        statusDisplay.textContent = config.messages.status.uploading;
-        
+        // Update Status Tengah (Processing)
+        statusUI.innerHTML = `
+            <i data-lucide="loader-2" class="spinning"></i>
+            <span>${config.messages.status.processing}</span>
+        `;
+        lucide.createIcons();
+
         const overlayImg = new Image();
         overlayImg.src = config.overlaySource;
 
-        overlayImg.onload = function() {
+        overlayImg.onload = () => {
             const userImg = new Image();
             userImg.src = URL.createObjectURL(file);
 
-            userImg.onload = function() {
-                statusDisplay.textContent = config.messages.status.processing;
-                
+            userImg.onload = () => {
                 const gen = new Generator({
                     width: overlayImg.width,
                     height: overlayImg.height
                 });
 
-                gen.addLayer(userImg); 
+                gen.addLayer(userImg);
                 gen.addLayer(overlayImg, { isOverlay: true });
-                
                 const result = gen.render();
 
-                // Tampilkan Hasil di Kotak 1x1
+                // Tampilkan Hasil & Hilangkan Status
                 zone.innerHTML = `<img src="${result}" class="preview-img">`;
-                statusDisplay.textContent = config.messages.status.done;
-
-                // Render Tombol (Unduh & Buat Lagi)
-                uiGroup.innerHTML = ""; // Pastikan bersih
+                
+                // Tampilkan Tombol
+                uiGroup.innerHTML = "";
                 uiGroup.style.display = 'flex';
 
-                // Tombol Unduh
-                let btnDl = document.createElement('button');
+                const btnDl = document.createElement('button');
                 btnDl.className = 'btn-download';
                 btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
                 btnDl.onclick = () => {
                     const a = document.createElement('a');
-                    a.href = result;
-                    a.download = config.profilePictureName;
-                    a.click();
+                    a.href = result; a.download = config.profilePictureName; a.click();
                 };
 
-                // Tombol Buat Lagi (Balik ke Beranda Sesuai Request)
-                let btnRe = document.createElement('button');
+                const btnRe = document.createElement('button');
                 btnRe.className = 'btn-reset';
                 btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
-                btnRe.onclick = () => {
-                    generateElements(); // Panggil ulang fungsi utama untuk reset total
-                };
+                btnRe.onclick = () => initApp(); // Balik ke Beranda
 
                 uiGroup.appendChild(btnDl);
                 uiGroup.appendChild(btnRe);
