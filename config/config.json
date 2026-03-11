@@ -1,25 +1,18 @@
 {
 	"profilePictureName": "image.png", 
-	"overlaySource": "assets/img/rahmen/tuerkis.png", 
+	"overlaySource": "assets/twibbon.png", 
 	"backgroundColor": "#ffffff", 
-	"rootElementId": "generator", 
-	"logoSources": [
-		"assets/img/logos/gemeinschaft-online.png",
-		"assets/img/logos/gegen-das-virus.png",
-		"assets/img/logos/krisen-kultur.png",
-		"assets/img/logos/corona-jobs.png",
-		"assets/img/logos/ich-lerne-online.png"
-	],
+	"rootElementId": "app", 
 	"messages": {
 		"status": {
-			"startup": "Bitte Profilbild auswählen", 
-			"uploading": "Datei wird importiert, bitte warten...", 
-			"processing": "Datei wird verarbeitet, bitte warten...", 
-			"done": "Fertig!"
+			"startup": "Silakan pilih foto profil", 
+			"uploading": "Mengimpor berkas, mohon tunggu...", 
+			"processing": "Memproses berkas, mohon tunggu...", 
+			"done": "Selesai!"
 		}, 
 		"buttons": {
-			"download": "Bild herunterladen!", 
-			"newImage": "Neues Profilbild erstellen."
+			"download": "Unduh Gambar!", 
+			"newImage": "Buat foto profil baru."
 		}
 	}
 }
