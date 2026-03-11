@@ -1,120 +1,152 @@
 let config;
-let isGenerated = false;
 
 addEventListener('load', function() {  
-    fetch('config/config.json')
-        .then(res => res.json())
-        .then(json => {
+    const request = new Request('config/config.json');
+  
+    fetch(request)
+        .then(response => {
+            if(response.status == 200) {
+                return response.json();
+            } else {
+                throw new Error("Could not fetch config from server!");
+            }
+        }).then(json => {
             config = json;
-            initApp();
+            generateElements();
+        }).catch(error => {
+            console.error(error);
         });
 });
 
-function initApp() {
-    const main = document.getElementById(config.rootElementId);
-    main.innerHTML = ""; // Clear total
+function generateElements() {
+    // 1. Bersihkan Root
+    var mainElement = document.getElementById(config.rootElementId);
+    mainElement.innerHTML = "";
     
-    // Status
-    const status = document.createElement('div');
-    status.className = 'status-msg';
-    status.id = 'app-status';
-    status.textContent = config.messages.status.startup;
-    main.appendChild(status);
+    // 2. Status Element
+    let statusElement = document.createElement('div');
+    statusElement.className = 'status-msg';
+    statusElement.id = 'status-display';
+    statusElement.textContent = config.messages.status.startup;
+    mainElement.appendChild(statusElement);
 
-    // Canvas/Box Area
-    const box = document.createElement('div');
-    box.className = 'box-1x1';
-    box.id = 'drop-area';
-    box.innerHTML = `<div class="placeholder-text"><i data-lucide="image-plus"></i>Ketuk untuk pilih foto</div>`;
-    main.appendChild(box);
+    // 3. Drop Area Square 1x1
+    let dropArea = document.createElement('div');
+    dropArea.className = 'drop-area-square';
+    dropArea.id = 'drop-zone';
+    dropArea.innerHTML = `
+        <div class="placeholder-content">
+            <i data-lucide="image-plus"></i>
+            <span>Klik atau Seret Foto</span>
+        </div>
+    `;
+    mainElement.appendChild(dropArea);
 
-    // Input File (Hidden)
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.style.display = 'none';
-    main.appendChild(input);
-
-    // Container Tombol (Biar gak dobel, kita buat satu kali di sini tapi sembunyiin dulu)
-    const btnGroup = document.createElement('div');
+    // 4. Input File (Hidden)
+    let fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none'; 
+    mainElement.appendChild(fileInput);
+    
+    // 5. Button Container (Satu kali deklarasi)
+    let btnGroup = document.createElement('div');
     btnGroup.className = 'btn-group';
-    btnGroup.id = 'btn-container';
-    btnGroup.style.display = 'none'; 
-    main.appendChild(btnGroup);
+    btnGroup.id = 'btn-group-ui';
+    btnGroup.style.display = 'none';
+    mainElement.appendChild(btnGroup);
 
+    // Initial Icons
     lucide.createIcons();
 
-    // Trigger
-    box.onclick = () => input.click();
+    // --- INTERAKSI ---
 
-    input.onchange = function() {
-        if(this.files && this.files[0]) {
-            handleProcess(this.files[0]);
-        }
-    };
-}
+    dropArea.onclick = () => fileInput.click();
 
-function handleProcess(file) {
-    const status = document.getElementById('app-status');
-    const box = document.getElementById('drop-area');
-    const btnContainer = document.getElementById('btn-container');
-    
-    status.textContent = config.messages.status.processing;
+    // Drag & Drop
+    ['dragenter', 'dragover'].forEach(e => {
+        dropArea.addEventListener(e, (ev) => { ev.preventDefault(); dropArea.classList.add('active'); });
+    });
+    ['dragleave', 'drop'].forEach(e => {
+        dropArea.addEventListener(e, (ev) => { ev.preventDefault(); dropArea.classList.remove('active'); });
+    });
 
-    const overlayImg = new Image();
-    overlayImg.src = config.overlaySource;
+    dropArea.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if(files.length) processImage(files[0]);
+    });
 
-    overlayImg.onload = () => {
-        const userImg = new Image();
-        userImg.src = URL.createObjectURL(file);
+    fileInput.addEventListener('change', function() {
+        if(this.files && this.files[0]) processImage(this.files[0]);
+    });
 
-        userImg.onload = () => {
-            const gen = new Generator({
-                width: overlayImg.width,
-                height: overlayImg.height
-            });
+    function processImage(file) {
+        const statusDisplay = document.getElementById('status-display');
+        const zone = document.getElementById('drop-zone');
+        const uiGroup = document.getElementById('btn-group-ui');
 
-            gen.addLayer(userImg);
-            gen.addLayer(overlayImg, { isOverlay: true });
+        statusDisplay.textContent = config.messages.status.uploading;
+        
+        const overlayImg = new Image();
+        overlayImg.src = config.overlaySource;
 
-            const result = gen.render();
-            
-            // Update Tampilan (Auto-Replace)
-            box.innerHTML = `<img src="${result}">`;
-            status.textContent = config.messages.status.done;
+        overlayImg.onload = function() {
+            const userImg = new Image();
+            userImg.src = URL.createObjectURL(file);
 
-            // Render Tombol HANYA jika belum ada
-            if (btnContainer.innerHTML === "") {
-                btnContainer.style.display = 'flex';
+            userImg.onload = function() {
+                statusDisplay.textContent = config.messages.status.processing;
                 
-                const btnDl = document.createElement('button');
-                btnDl.className = 'btn-download';
-                btnDl.innerHTML = `<i data-lucide="download"></i> Unduh`;
-                btnDl.onclick = () => {
-                    const a = document.createElement('a');
-                    a.href = result;
-                    a.download = config.profilePictureName;
-                    a.click();
-                };
+                const gen = new Generator({
+                    width: overlayImg.width,
+                    height: overlayImg.height
+                });
 
-                const btnRe = document.createElement('button');
-                btnRe.className = 'btn-reset';
-                btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> Ganti Foto`;
-                btnRe.onclick = () => document.querySelector('input[type="file"]').click();
+                gen.addLayer(userImg); 
+                gen.addLayer(overlayImg, { isOverlay: true });
+                
+                const result = gen.render();
 
-                btnContainer.appendChild(btnDl);
-                btnContainer.appendChild(btnRe);
+                // Update Preview (Auto-Replace)
+                zone.innerHTML = `<img src="${result}">`;
+                zone.style.border = "none";
+                statusDisplay.textContent = config.messages.status.done;
+
+                // Render Tombol HANYA jika belum ada (Cegah Dobel)
+                if (uiGroup.innerHTML === "") {
+                    uiGroup.style.display = 'flex';
+
+                    // Tombol Unduh
+                    let btnDl = document.createElement('button');
+                    btnDl.className = 'btn-download';
+                    btnDl.id = 'final-dl-btn';
+                    btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
+                    btnDl.onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = result;
+                        a.download = config.profilePictureName;
+                        a.click();
+                    };
+
+                    // Tombol Ganti Foto (Auto-Replace logic)
+                    let btnRe = document.createElement('button');
+                    btnRe.className = 'btn-reset';
+                    btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
+                    btnRe.onclick = () => fileInput.click();
+
+                    uiGroup.appendChild(btnDl);
+                    uiGroup.appendChild(btnRe);
+                } else {
+                    // Update fungsi download ke gambar terbaru jika ganti foto
+                    document.getElementById('final-dl-btn').onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = result;
+                        a.download = config.profilePictureName;
+                        a.click();
+                    };
+                }
                 lucide.createIcons();
-            } else {
-                // Jika tombol sudah ada, cukup update fungsi download-nya ke gambar baru
-                const dlBtn = btnContainer.querySelector('.btn-download');
-                dlBtn.onclick = () => {
-                    const a = document.createElement('a');
-                    a.href = result;
-                    a.download = config.profilePictureName;
-                    a.click();
-                };
-            }
+            };
         };
-    };
+    }
 }
