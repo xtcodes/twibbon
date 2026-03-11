@@ -2,150 +2,120 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Twibbon Generator Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twibbon Generator</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --primary: #4A90E2;
-            --success: #00B894;
-            --bg: #F0F2F5;
-            --text: #2D3436;
-        }
-
+        /* Tipografi Normal / Standar */
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
             margin: 0;
-            padding: 10px; /* Minimal padding biar gak mepet layar HP */
+            padding: 20px; /* Jarak aman atas, bawah, kiri, kanan */
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text);
-            box-sizing: border-box;
+            justify-content: center;
         }
 
-        .container {
+        /* Container agar tidak mepet layar */
+        .wrapper {
             width: 100%;
-            max-width: 500px;
+            max-width: 480px; /* Lebar maksimal biar gak melar di desktop */
+            margin-top: 20px;
         }
 
         #app {
-            background: white;
-            padding: 15px; /* Padding dipangkas biar gak boros */
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             text-align: center;
-            width: 100%;
-            box-sizing: border-box;
         }
 
-        .status-text {
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin: 0 0 12px 0; /* Margin diperkecil */
-            color: #636E72;
+        .status-msg {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 500;
         }
 
-        /* 1:1 SQUARE - Tetap Presisi */
-        .drop-area-square {
+        /* Box Drop Area 1:1 */
+        .box-1x1 {
             width: 100%;
             aspect-ratio: 1 / 1;
-            background: #F8F9FA;
-            border: 2px dashed #D1D8E0;
-            border-radius: 12px;
+            background: #fafafa;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             overflow: hidden;
+            margin-bottom: 20px;
             position: relative;
-            margin-bottom: 15px;
         }
 
-        .drop-content i { 
-            width: 32px; /* Icon diperkecil buat mobile */
-            height: 32px;
-            margin-bottom: 8px;
-            color: #B2BEC3;
-        }
-
-        .drop-content span {
-            font-size: 0.85rem;
-            display: block;
-        }
-
-        .preview-img {
+        .box-1x1 img {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
 
-        /* BUTTON GROUP - Rapat & Responsif */
-        .button-group { 
-            display: flex; 
-            gap: 8px; /* Gap diperkecil */
-            width: 100%;
+        .placeholder-text {
+            color: #888;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
-        
+
+        /* Button Group */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
         button {
             flex: 1;
-            padding: 12px 8px; /* Padding lebih ramping */
+            padding: 12px;
             border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.85rem; /* Font size menyesuaikan mobile */
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 6px;
         }
 
-        .btn-download { background: var(--success); color: white; }
-        .btn-reset { background: #F1F2F6; color: #2F3542; }
+        .btn-download { background: #00b894; color: #fff; }
+        .btn-reset { background: #e0e0e0; color: #333; }
 
-        /* ARTIKEL SECTION - Compact */
-        .article-section {
-            margin-top: 25px;
-            padding: 0 5px;
-            font-size: 0.9rem; /* Font lebih kecil biar gak numpuk */
-            line-height: 1.5;
+        /* Artikel Section */
+        .content {
+            margin-top: 30px;
+            color: #444;
+            line-height: 1.6;
+            font-size: 15px;
         }
         
-        .article-section h2 { font-size: 1.2rem; margin-bottom: 10px; }
-        .article-section h3 { font-size: 1rem; margin-top: 15px; }
-
-        /* Khusus Desktop: Balikin space dikit biar gak kekecilan */
-        @media (min-width: 600px) {
-            body { padding: 40px 20px; }
-            #app { padding: 25px; }
-            button { font-size: 1rem; padding: 14px; }
-            .status-text { font-size: 1.1rem; }
-        }
+        .content h2 { font-size: 20px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="app"></div>
+<div class="wrapper">
+    <div id="app">
+        </div>
 
-    <div class="article-section">
-        <h2>Cara Menggunakan Twibbon</h2>
-        <p>Twibbon adalah cara termudah untuk memberikan dukungan pada kampanye secara visual. Dengan generator kami, Anda tidak perlu aplikasi rumit.</p>
-        
-        <h3>Langkah:</h3>
-        <p>1. Klik kotak di atas untuk pilih foto.<br>
-           2. Foto akan terpotong otomatis.<br>
-           3. Klik unduh dan bagikan ke media sosial.</p>
-
-        <h3>Privasi Aman</h3>
-        <p>Foto diproses langsung di browser Anda. Kami tidak menyimpan atau mengirim foto Anda ke server mana pun.</p>
+    <div class="content">
+        <h2>Cara Pakai</h2>
+        <p>Pilih foto profil kamu, sistem akan otomatis menggabungkannya dengan twibbon. Kamu bisa langsung ganti foto tanpa harus reset.</p>
     </div>
 </div>
 
 <script src="src/js/index.js"></script>
 <script src="src/js/app.js"></script>
-<script>lucide.createIcons();</script>
 </body>
 </html>
