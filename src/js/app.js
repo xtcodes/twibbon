@@ -14,47 +14,41 @@ addEventListener('load', function() {
             config = json;
             generateElements();
         }).catch(error => {
-            console.log(error);
+            console.error(error);
         });
 });
 
 function generateElements() {
-    // 1. Ambil Root Element
     var mainElement = document.getElementById(config.rootElementId);
     mainElement.innerHTML = "";
     
-    // 2. Status Text
     let statusElement = document.createElement('p');
     statusElement.className = 'status-text';
     statusElement.textContent = config.messages.status.startup;
     mainElement.appendChild(statusElement);
 
-    // 3. Drop Area Square 1:1
+    // Drop Area Square 1:1 dengan Font Icon Lucide
     let dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.innerHTML = `
         <div class="drop-content">
-            <span class="icon">📸</span>
-            <span class="label">Klik atau Seret Foto Ke Sini</span>
+            <i data-lucide="image-plus"></i>
+            <span>Klik atau Seret Foto</span>
         </div>
     `;
     mainElement.appendChild(dropArea);
+    lucide.createIcons(); // Re-render icons
 
-    // 4. Input File Tersembunyi
     let fileUploadElement = document.createElement('input');
     fileUploadElement.type = 'file';
     fileUploadElement.accept = 'image/*';
     fileUploadElement.style.display = 'none'; 
     mainElement.appendChild(fileUploadElement);
     
-    // 5. Preload Overlay (Twibbon)
     let overlayImageElement = new Image();
     overlayImageElement.src = config.overlaySource;
-    overlayImageElement.style.display = 'none';
-    mainElement.appendChild(overlayImageElement);
 
-    // --- LOGIKA INTERAKSI ---
-
+    // Interaction
     dropArea.onclick = () => fileUploadElement.click();
 
     ['dragenter', 'dragover'].forEach(name => {
@@ -88,21 +82,19 @@ function generateElements() {
         uploadedImage.onload = function() {
             statusElement.textContent = config.messages.status.processing;
             
-            // Setup Generator dengan resolusi asli twibbon
             let setupOptions = {
                 width: overlayImageElement.width,
                 height: overlayImageElement.height
             }
             const generator = new Generator(setupOptions);
             
-            // Render Layer (Logic Auto-Crop)
+            // Render (Make sure Generator class handles cropping)
             generator.addLayer(uploadedImage); 
             generator.addLayer(overlayImageElement, { isOverlay: true });
             
-            // Render ke Data URL
             let resultData = generator.render();
 
-            // UPDATE UI: Ganti isi drop area dengan hasil
+            // Clear area for result preview
             dropArea.innerHTML = "";
             dropArea.style.border = "none";
             
@@ -113,23 +105,27 @@ function generateElements() {
 
             statusElement.textContent = config.messages.status.done;
 
-            // Tombol Kontrol
+            // BUTTON GROUP
             let buttonContainer = document.createElement('div');
             buttonContainer.className = 'button-group';
             
+            // Tombol Unduh murni Button
             let downloadButtonElement = document.createElement('button');
             downloadButtonElement.className = 'btn-download';
-            downloadButtonElement.innerText = config.messages.buttons.download;
+            downloadButtonElement.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
             downloadButtonElement.onclick = function() {
                 const link = document.createElement('a');
                 link.href = resultData;
                 link.download = config.profilePictureName;
+                document.body.appendChild(link);
                 link.click();
+                document.body.removeChild(link);
             };
             
+            // Tombol Reset
             let renewFormElement = document.createElement('button');
             renewFormElement.className = 'btn-reset';
-            renewFormElement.innerText = config.messages.buttons.newImage;
+            renewFormElement.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
             renewFormElement.onclick = function(){
                 generateElements();
             };
@@ -137,6 +133,8 @@ function generateElements() {
             buttonContainer.appendChild(downloadButtonElement);
             buttonContainer.appendChild(renewFormElement);
             mainElement.appendChild(buttonContainer);
+            
+            lucide.createIcons(); // Re-render icons inside buttons
         };
     }
 }
