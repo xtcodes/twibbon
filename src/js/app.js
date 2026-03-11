@@ -19,98 +19,129 @@ addEventListener('load', function() {
 });
 
 function generateElements() {
-    // Bersihkan struktur DOM utama
+    // 1. Bersihkan struktur DOM utama
     var mainElement = document.getElementById(config.rootElementId);
     mainElement.innerHTML = "";
     
+    // 2. Status Element
     let statusElement = document.createElement('p');
+    statusElement.className = 'status-text';
     statusElement.textContent = config.messages.status.startup;
     mainElement.appendChild(statusElement);
 
-    // Input file dengan atribut accept untuk gambar
+    // 3. Create Drop Area (Box 1:1 Modern)
+    let dropArea = document.createElement('div');
+    dropArea.className = 'drop-area';
+    dropArea.innerHTML = `
+        <div class="upload-icon">📸</div>
+        <span>Klik atau Seret Foto ke Sini</span>
+    `;
+    mainElement.appendChild(dropArea);
+
+    // 4. Input file (Hidden, dipicu lewat drop area)
     let fileUploadElement = document.createElement('input');
     fileUploadElement.type = 'file';
-    fileUploadElement.accept = 'image/*'; // Menambahkan filter file gambar
+    fileUploadElement.accept = 'image/*';
+    fileUploadElement.style.display = 'none'; // Sembunyiin input jadul
     mainElement.appendChild(fileUploadElement);
     
+    // 5. Overlay Image (Twibbon)
     let overlayImageElement = new Image();
     overlayImageElement.src = config.overlaySource;
     overlayImageElement.style.display = 'none';
     mainElement.appendChild(overlayImageElement);
-    
-    fileUploadElement.addEventListener('change', function() {
-        if(this.files && this.files[0]) {
-            statusElement.textContent = config.messages.status.uploading;
-            
-            let uploadedImage = document.createElement('img');
-            uploadedImage.src = URL.createObjectURL(this.files[0]);
-            
-            uploadedImage.addEventListener('load', function() {
-                statusElement.textContent = config.messages.status.processing;
-                
-                // Setup generator
-                let setupOptions = {
-                    width: overlayImageElement.width,
-                    height: overlayImageElement.height
-                }
-                const generator = new Generator(setupOptions);
-                
-                // Kalkulasi skala gambar profil
-                let scale_width = setupOptions.width / uploadedImage.width;
-                let scale_height = setupOptions.height / uploadedImage.height;
-                let scale = Math.min(scale_width, scale_height);
-    
-                let renderOptions = {
-                    offset: {
-                        top: (setupOptions.height - (uploadedImage.height * scale)) / 2,
-                        left: (setupOptions.width - (uploadedImage.width * scale)) / 2
-                    },
-                    scale: scale
-                };
 
-                // Tambahkan layer (Hanya foto profil dan overlay twibbon)
-                generator.addLayer(uploadedImage, renderOptions);
-                generator.addLayer(overlayImageElement, {});
-                
-                // Tampilkan hasil preview
-                let downloadImageElement = document.createElement('img');
-                downloadImageElement.src = generator.render();
-                downloadImageElement.style.display = 'block';
-                downloadImageElement.style.marginBottom = '10px';
-                mainElement.appendChild(downloadImageElement);
+    // --- LOGIKA INTERAKSI ---
 
-                statusElement.textContent = config.messages.status.done;
+    // Klik kotak untuk pilih file
+    dropArea.addEventListener('click', () => fileUploadElement.click());
 
-                // --- BAGIAN TOMBOL BERDAMPINGAN ---
-                let buttonContainer = document.createElement('div');
-                buttonContainer.style.display = 'flex';
-                buttonContainer.style.gap = '10px'; // Memberi jarak antar tombol
-                
-                // Tombol Unduh (diubah dari <a> ke <button> secara visual)
-                let downloadButtonElement = document.createElement('button');
-                downloadButtonElement.innerText = config.messages.buttons.download;
-                downloadButtonElement.onclick = function() {
-                    const link = document.createElement('a');
-                    link.href = generator.render();
-                    link.download = config.profilePictureName;
-                    link.click();
-                };
-                
-                // Tombol Ulangi/Baru
-                let renewButtonElement = document.createElement('button');
-                renewButtonElement.innerText = config.messages.buttons.newImage;
-                renewButtonElement.onclick = function() {
-                    generateElements();
-                };
+    // Drag & Drop visual effect
+    ['dragenter', 'dragover'].forEach(name => {
+        dropArea.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropArea.classList.add('active');
+        });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+        dropArea.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('active');
+        });
+    });
 
-                // Masukkan ke dalam kontainer
-                buttonContainer.appendChild(downloadButtonElement);
-                buttonContainer.appendChild(renewButtonElement);
-                
-                // Hapus input file dan masukkan grup tombol
-                mainElement.removeChild(fileUploadElement);
-                mainElement.appendChild(buttonContainer);
-            });
+    // Handle File dari Drop
+    dropArea.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if(files.length) {
+            fileUploadElement.files = files;
+            processImage(files[0]);
         }
     });
-		}
+
+    // Handle File dari Input Klik
+    fileUploadElement.addEventListener('change', function() {
+        if(this.files && this.files[0]) {
+            processImage(this.files[0]);
+        }
+    });
+
+    // 6. Fungsi utama pemrosesan (Logika asli lu ada di sini)
+    function processImage(file) {
+        statusElement.textContent = config.messages.status.uploading;
+        
+        let uploadedImage = document.createElement('img');
+        uploadedImage.src = URL.createObjectURL(file);
+        
+        uploadedImage.addEventListener('load', function() {
+            statusElement.textContent = config.messages.status.processing;
+            
+            // Setup generator
+            let setupOptions = {
+                width: overlayImageElement.width,
+                height: overlayImageElement.height
+            }
+            const generator = new Generator(setupOptions);
+            
+            // Tambahkan layer (Gunakan class Generator yang auto-crop kemarin)
+            generator.addLayer(uploadedImage); 
+            generator.addLayer(overlayImageElement, { isOverlay: true });
+            
+            // Bersihkan tampilan UI untuk hasil
+            dropArea.remove();
+            
+            // Tampilkan hasil preview
+            let downloadImageElement = document.createElement('img');
+            downloadImageElement.src = generator.render();
+            downloadImageElement.className = 'result-preview';
+            mainElement.appendChild(downloadImageElement);
+
+            statusElement.textContent = config.messages.status.done;
+
+            // --- TOMBOL BERDAMPINGAN ---
+            let buttonContainer = document.createElement('div');
+            buttonContainer.className = 'button-group';
+            
+            let downloadButtonElement = document.createElement('button');
+            downloadButtonElement.className = 'btn-download';
+            downloadButtonElement.innerText = config.messages.buttons.download;
+            downloadButtonElement.onclick = function() {
+                const link = document.createElement('a');
+                link.href = generator.render();
+                link.download = config.profilePictureName;
+                link.click();
+            };
+            
+            let renewFormElement = document.createElement('button');
+            renewFormElement.className = 'btn-reset';
+            renewFormElement.innerText = config.messages.buttons.newImage;
+            renewFormElement.onclick = function(){
+                generateElements();
+            };
+
+            buttonContainer.appendChild(downloadButtonElement);
+            buttonContainer.appendChild(renewFormElement);
+            mainElement.appendChild(buttonContainer);
+        });
+    }
+}
