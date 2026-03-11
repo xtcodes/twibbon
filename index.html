@@ -6,12 +6,12 @@
     <title>Twibbon Generator</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Tipografi Standar & Normal */
+        /* Tipografi Normal & Standar */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #f0f2f5;
             margin: 0;
-            padding: 20px; /* Jarak aman biar gak mepet layar */
+            padding: 20px; /* Jarak aman agar tidak mepet layar */
             display: flex;
             justify-content: center;
             box-sizing: border-box;
@@ -19,7 +19,7 @@
 
         .wrapper {
             width: 100%;
-            max-width: 480px; /* Limit lebar desktop */
+            max-width: 480px; /* Limit lebar desktop agar tidak kaku */
             box-sizing: border-box;
         }
 
@@ -39,10 +39,10 @@
             font-weight: 600;
         }
 
-        /* SQUARE ASPECT RATIO 1x1 */
+        /* DROP AREA 1x1 SQUARE */
         .drop-area-square {
             width: 100%;
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 1 / 1; /* Kunci Kotak Sempurna */
             background: #fafafa;
             border: 2px dashed #D1D8E0;
             border-radius: 12px;
@@ -55,18 +55,16 @@
             position: relative;
         }
 
-        .drop-area-square.active { border-color: #4A90E2; background: #f0f7ff; }
-
-        .drop-area-square img {
-            width: 100%;
-            height: 100%;
+        /* Mencegah Canvas/Image Luber */
+        .drop-area-square img, .drop-area-square canvas {
+            width: 100% !important;
+            height: 100% !important;
             object-fit: contain;
         }
 
         .placeholder-content {
             color: #888;
             font-size: 14px;
-            text-align: center;
         }
 
         .placeholder-content i {
@@ -76,7 +74,7 @@
             height: 40px;
         }
 
-        /* Button Group Identik */
+        /* Button Group Sinkron */
         .btn-group {
             display: flex;
             gap: 10px;
@@ -95,15 +93,12 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: opacity 0.2s;
         }
-
-        button:active { opacity: 0.8; }
 
         .btn-download { background: #00b894; color: #fff; }
         .btn-reset { background: #e0e0e0; color: #333; }
 
-        /* ARTIKEL UTUH - TIDAK DIRINGKAS */
+        /* Artikel Utuh Tanpa Ringkasan */
         .article-section {
             margin-top: 35px;
             color: #2D3436;
@@ -111,7 +106,7 @@
             text-align: left;
         }
 
-        .article-section h2 { font-size: 1.5rem; margin-bottom: 15px; color: #2D3436; }
+        .article-section h2 { font-size: 1.5rem; margin-bottom: 15px; }
         .article-section h3 { font-size: 1.2rem; margin-top: 25px; }
         .article-section ul { padding-left: 20px; }
         .article-section li { margin-bottom: 8px; }
