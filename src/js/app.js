@@ -5,8 +5,7 @@ addEventListener('load', function() {
         .then(res => res.json())
         .then(json => {
             config = json;
-            // Set Judul & Subtitle Awal dari Config
-            document.getElementById('main-title').textContent = config.appTitle || "Twibbon Generator";
+            document.getElementById('main-title').textContent = config.appTitle;
             initApp();
         });
 });
@@ -15,15 +14,16 @@ function initApp() {
     const container = document.getElementById('dynamic-content');
     const subMsg = document.getElementById('sub-msg');
     
-    // Ambil pesan startup dari config
+    // Pastikan pesan awal dari config
     subMsg.textContent = config.messages.status.startup;
     container.innerHTML = "";
 
+    // Buat ulang Drop Area
     const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     
-    // Status awal di tengah (Startup)
+    // Status UI di tengah drop area
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -38,6 +38,7 @@ function initApp() {
     fileInput.style.display = 'none';
     container.appendChild(fileInput);
 
+    // Group tombol (Download & Reset)
     const btnGroup = document.createElement('div');
     btnGroup.className = 'btn-group';
     btnGroup.id = 'ui-group';
@@ -55,8 +56,9 @@ function initApp() {
         const statusUI = document.getElementById('status-ui');
         const uiGroup = document.getElementById('ui-group');
         const subMsg = document.getElementById('sub-msg');
+        const zone = document.getElementById('drop-zone');
 
-        // Gunakan pesan Processing dari config
+        // Update status ke "Processing"
         subMsg.textContent = config.messages.status.processing;
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
@@ -82,20 +84,15 @@ function initApp() {
                     gen.addLayer(overlayImg, { isOverlay: true });
                     const result = gen.render();
 
-                    // HAPUS BORDER: Ganti zone lama dengan container polos
-                    const oldZone = document.getElementById('drop-zone');
-                    const newZone = document.createElement('div');
-                    newZone.className = 'result-container'; 
-                    newZone.innerHTML = `<img src="${result}" class="preview-img">`;
-                    oldZone.parentNode.replaceChild(newZone, oldZone);
+                    // TAMPILKAN HASIL: Hilangkan border, masukkan gambar
+                    zone.classList.add('no-border'); 
+                    zone.innerHTML = `<img src="${result}" class="preview-img">`;
                     
-                    // Pesan Selesai dari config
                     subMsg.textContent = config.messages.status.done;
-                    
                     uiGroup.innerHTML = "";
                     uiGroup.style.display = 'flex';
 
-                    // Tombol Unduh (Teks dari config)
+                    // Tombol Download
                     const btnDl = document.createElement('button');
                     btnDl.className = 'btn-download';
                     btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
@@ -104,7 +101,7 @@ function initApp() {
                         a.href = result; a.download = config.profilePictureName; a.click();
                     };
 
-                    // Tombol Reset (Teks dari config)
+                    // Tombol Reset
                     const btnRe = document.createElement('button');
                     btnRe.className = 'btn-reset';
                     btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
