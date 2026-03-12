@@ -17,9 +17,8 @@ function initApp() {
     container.innerHTML = "";
 
     const dropArea = document.createElement('div');
-    dropArea.className = 'drop-area-square'; // Pake border awal
+    dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
-    
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -50,17 +49,15 @@ function initApp() {
     function processImage(file) {
         const statusUI = document.getElementById('status-ui');
         const uiGroup = document.getElementById('ui-group');
-        const zone = document.getElementById('drop-zone');
         const subMsg = document.getElementById('sub-msg');
 
-        // Render Spinner
+        // Spinner muter dulu
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
             <span>${config.messages.status.processing}</span>
         `;
         lucide.createIcons();
 
-        // Jeda biar spinner muter dulu
         setTimeout(() => {
             const overlayImg = new Image();
             overlayImg.src = config.overlaySource;
@@ -79,9 +76,12 @@ function initApp() {
                     gen.addLayer(overlayImg, { isOverlay: true });
                     const result = gen.render();
 
-                    // FIX: Hilangkan Border & Tampilkan Gambar Bersih
-                    zone.classList.add('no-border'); 
-                    zone.innerHTML = `<img src="${result}" class="preview-img">`;
+                    // FIX TOTAL: Hapus Drop Area lama, ganti Container Polos
+                    const oldZone = document.getElementById('drop-zone');
+                    const newZone = document.createElement('div');
+                    newZone.className = 'result-container'; // Class tanpa border
+                    newZone.innerHTML = `<img src="${result}" class="preview-img">`;
+                    oldZone.parentNode.replaceChild(newZone, oldZone);
                     
                     subMsg.textContent = config.messages.status.done;
                     uiGroup.innerHTML = "";
@@ -105,6 +105,6 @@ function initApp() {
                     lucide.createIcons();
                 };
             };
-        }, 100);
+        }, 150);
     }
 }
