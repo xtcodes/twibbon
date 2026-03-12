@@ -20,6 +20,7 @@ function initApp() {
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     
+    // Status Startup di Tengah Drop Area
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -54,59 +55,61 @@ function initApp() {
         const zone = document.getElementById('drop-zone');
         const subMsg = document.getElementById('sub-msg');
 
-        // 1. Render Loading Spinner Dulu
+        // Render Spinner di Tengah
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
             <span>${config.messages.status.processing}</span>
         `;
         lucide.createIcons();
 
-        // 2. Gunakan setTimeout (0ms) untuk memberi browser jeda render animasi
-        // sebelum menjalankan logika Generator yang berat
-        setTimeout(() => {
-            const overlayImg = new Image();
-            overlayImg.src = config.overlaySource;
+        // Trik requestAnimationFrame + setTimeout biar spinner nggak beku
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const overlayImg = new Image();
+                    overlayImg.src = config.overlaySource;
 
-            overlayImg.onload = () => {
-                const userImg = new Image();
-                userImg.src = URL.createObjectURL(file);
+                    overlayImg.onload = () => {
+                        const userImg = new Image();
+                        userImg.src = URL.createObjectURL(file);
 
-                userImg.onload = () => {
-                    const gen = new Generator({
-                        width: overlayImg.width,
-                        height: overlayImg.height
-                    });
+                        userImg.onload = () => {
+                            const gen = new Generator({
+                                width: overlayImg.width,
+                                height: overlayImg.height
+                            });
 
-                    gen.addLayer(userImg);
-                    gen.addLayer(overlayImg, { isOverlay: true });
-                    const result = gen.render();
+                            gen.addLayer(userImg);
+                            gen.addLayer(overlayImg, { isOverlay: true });
+                            const result = gen.render();
 
-                    // Ganti isi kotak dengan hasil final
-                    zone.innerHTML = `<img src="${result}" class="preview-img">`;
-                    
-                    subMsg.textContent = config.messages.status.done;
-                    
-                    uiGroup.innerHTML = "";
-                    uiGroup.style.display = 'flex';
+                            // Hasil Final
+                            zone.innerHTML = `<img src="${result}" class="preview-img">`;
+                            subMsg.textContent = config.messages.status.done;
+                            
+                            uiGroup.innerHTML = "";
+                            uiGroup.style.display = 'flex';
 
-                    const btnDl = document.createElement('button');
-                    btnDl.className = 'btn-download';
-                    btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
-                    btnDl.onclick = () => {
-                        const a = document.createElement('a');
-                        a.href = result; a.download = config.profilePictureName; a.click();
+                            const btnDl = document.createElement('button');
+                            btnDl.className = 'btn-download';
+                            btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
+                            btnDl.onclick = () => {
+                                const a = document.createElement('a');
+                                a.href = result; a.download = config.profilePictureName; a.click();
+                            };
+
+                            const btnRe = document.createElement('button');
+                            btnRe.className = 'btn-reset';
+                            btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
+                            btnRe.onclick = () => initApp(); 
+
+                            uiGroup.appendChild(btnDl);
+                            uiGroup.appendChild(btnRe);
+                            lucide.createIcons();
+                        };
                     };
-
-                    const btnRe = document.createElement('button');
-                    btnRe.className = 'btn-reset';
-                    btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
-                    btnRe.onclick = () => initApp(); 
-
-                    uiGroup.appendChild(btnDl);
-                    uiGroup.appendChild(btnRe);
-                    lucide.createIcons();
-                };
-            };
-        }, 50); // Delay 50ms biar browser sempet muterin spinner
+                }, 100); // Jeda 100ms agar UI sempat update animasi
+            });
+        });
     }
 }
