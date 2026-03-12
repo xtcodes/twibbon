@@ -17,10 +17,9 @@ function initApp() {
     container.innerHTML = "";
 
     const dropArea = document.createElement('div');
-    dropArea.className = 'drop-area-square';
+    dropArea.className = 'drop-area-square'; // Pake border awal
     dropArea.id = 'drop-zone';
     
-    // Status Startup di Tengah Drop Area
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -42,7 +41,6 @@ function initApp() {
     container.appendChild(btnGroup);
 
     lucide.createIcons();
-
     dropArea.onclick = () => fileInput.click();
 
     fileInput.onchange = function() {
@@ -55,61 +53,58 @@ function initApp() {
         const zone = document.getElementById('drop-zone');
         const subMsg = document.getElementById('sub-msg');
 
-        // Render Spinner di Tengah
+        // Render Spinner
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
             <span>${config.messages.status.processing}</span>
         `;
         lucide.createIcons();
 
-        // Trik requestAnimationFrame + setTimeout biar spinner nggak beku
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                setTimeout(() => {
-                    const overlayImg = new Image();
-                    overlayImg.src = config.overlaySource;
+        // Jeda biar spinner muter dulu
+        setTimeout(() => {
+            const overlayImg = new Image();
+            overlayImg.src = config.overlaySource;
 
-                    overlayImg.onload = () => {
-                        const userImg = new Image();
-                        userImg.src = URL.createObjectURL(file);
+            overlayImg.onload = () => {
+                const userImg = new Image();
+                userImg.src = URL.createObjectURL(file);
 
-                        userImg.onload = () => {
-                            const gen = new Generator({
-                                width: overlayImg.width,
-                                height: overlayImg.height
-                            });
+                userImg.onload = () => {
+                    const gen = new Generator({
+                        width: overlayImg.width,
+                        height: overlayImg.height
+                    });
 
-                            gen.addLayer(userImg);
-                            gen.addLayer(overlayImg, { isOverlay: true });
-                            const result = gen.render();
+                    gen.addLayer(userImg);
+                    gen.addLayer(overlayImg, { isOverlay: true });
+                    const result = gen.render();
 
-                            // Hasil Final
-                            zone.innerHTML = `<img src="${result}" class="preview-img">`;
-                            subMsg.textContent = config.messages.status.done;
-                            
-                            uiGroup.innerHTML = "";
-                            uiGroup.style.display = 'flex';
+                    // FIX: Hilangkan Border & Tampilkan Gambar Bersih
+                    zone.classList.add('no-border'); 
+                    zone.innerHTML = `<img src="${result}" class="preview-img">`;
+                    
+                    subMsg.textContent = config.messages.status.done;
+                    uiGroup.innerHTML = "";
+                    uiGroup.style.display = 'flex';
 
-                            const btnDl = document.createElement('button');
-                            btnDl.className = 'btn-download';
-                            btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
-                            btnDl.onclick = () => {
-                                const a = document.createElement('a');
-                                a.href = result; a.download = config.profilePictureName; a.click();
-                            };
-
-                            const btnRe = document.createElement('button');
-                            btnRe.className = 'btn-reset';
-                            btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
-                            btnRe.onclick = () => initApp(); 
-
-                            uiGroup.appendChild(btnDl);
-                            uiGroup.appendChild(btnRe);
-                            lucide.createIcons();
-                        };
+                    const btnDl = document.createElement('button');
+                    btnDl.className = 'btn-download';
+                    btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
+                    btnDl.onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = result; a.download = config.profilePictureName; a.click();
                     };
-                }, 100); // Jeda 100ms agar UI sempat update animasi
-            });
-        });
+
+                    const btnRe = document.createElement('button');
+                    btnRe.className = 'btn-reset';
+                    btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
+                    btnRe.onclick = () => initApp(); 
+
+                    uiGroup.appendChild(btnDl);
+                    uiGroup.appendChild(btnRe);
+                    lucide.createIcons();
+                };
+            };
+        }, 100);
     }
 }
