@@ -11,14 +11,18 @@ addEventListener('load', function() {
 
 function initApp() {
     const container = document.getElementById('dynamic-content');
+    const subMsg = document.getElementById('sub-msg');
+    
+    // Kembalikan subtitle asli pas reset
+    subMsg.textContent = "Silakan pilih foto profil";
     container.innerHTML = "";
 
-    // 1. Drop Area
+    // 1. Drop Area Kotak Sempurna 1:1
     const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     
-    // Status Teks di Tengah (Startup)
+    // Status awal di tengah
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -27,14 +31,12 @@ function initApp() {
     `;
     container.appendChild(dropArea);
 
-    // 2. Input File
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
     fileInput.style.display = 'none';
     container.appendChild(fileInput);
 
-    // 3. Button Group (Sembunyi dulu)
     const btnGroup = document.createElement('div');
     btnGroup.className = 'btn-group';
     btnGroup.id = 'ui-group';
@@ -53,8 +55,9 @@ function initApp() {
         const statusUI = document.getElementById('status-ui');
         const uiGroup = document.getElementById('ui-group');
         const zone = document.getElementById('drop-zone');
+        const subMsg = document.getElementById('sub-msg');
 
-        // Update Status Tengah (Processing)
+        // Pindahkan "Mengimpor..." ke tengah kotak
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
             <span>${config.messages.status.processing}</span>
@@ -78,10 +81,13 @@ function initApp() {
                 gen.addLayer(overlayImg, { isOverlay: true });
                 const result = gen.render();
 
-                // Tampilkan Hasil & Hilangkan Status
+                // Ganti isi kotak dengan hasil final
                 zone.innerHTML = `<img src="${result}" class="preview-img">`;
                 
-                // Tampilkan Tombol
+                // Header tetap, subtitel ganti status selesai
+                subMsg.textContent = config.messages.status.done;
+                
+                // Tampilkan tombol unduh dan reset balik beranda
                 uiGroup.innerHTML = "";
                 uiGroup.style.display = 'flex';
 
@@ -96,7 +102,7 @@ function initApp() {
                 const btnRe = document.createElement('button');
                 btnRe.className = 'btn-reset';
                 btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
-                btnRe.onclick = () => initApp(); // Balik ke Beranda
+                btnRe.onclick = () => initApp(); // Reset balik ke beranda
 
                 uiGroup.appendChild(btnDl);
                 uiGroup.appendChild(btnRe);
