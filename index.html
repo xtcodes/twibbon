@@ -26,11 +26,11 @@
             text-align: center;
         }
 
-        /* Header & Subtitle Tetap */
-        .header-title { font-size: 1.2rem; font-weight: 800; color: #2d3436; margin: 0 0 4px 0; }
-        .header-sub { font-size: 0.9rem; color: #636e72; margin: 0 0 20px 0; }
+        /* Header & Subtitle Tetap Konsisten */
+        .header-title { font-size: 1.25rem; font-weight: 800; color: #2d3436; margin: 0 0 4px 0; }
+        .header-sub { font-size: 0.95rem; color: #636e72; margin: 0 0 20px 0; }
 
-        /* DROP AREA 1x1 */
+        /* DROP AREA 1x1 SQUARE */
         .drop-area-square {
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -46,23 +46,22 @@
             margin-bottom: 20px;
         }
 
-        /* Overlay Status di Tengah Drop Area */
+        /* Status UI di Tengah Drop Area */
         .status-overlay {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: #888;
-            text-align: center;
             padding: 20px;
             z-index: 10;
         }
 
-        .status-overlay i { width: 56px; height: 56px; margin-bottom: 12px; stroke-width: 1.5; }
-        .status-overlay span { font-size: 0.95rem; font-weight: 600; line-height: 1.4; }
+        .status-overlay i { width: 52px; height: 52px; margin-bottom: 12px; stroke-width: 1.5; }
+        .status-overlay span { font-size: 1rem; font-weight: 600; line-height: 1.4; }
 
-        /* Loading Spinner Animation */
-        .spinning { animation: spin 2s linear infinite; color: #4a90e2; }
+        /* Animasi Loader Profesional */
+        .spinning { animation: spin 1.5s linear infinite; color: #4a90e2; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .preview-img { width: 100%; height: 100%; object-fit: contain; }
@@ -77,8 +76,7 @@
         .btn-reset { background: #f1f2f6; color: #2d3436; }
 
         .article-section { margin-top: 40px; text-align: left; line-height: 1.7; color: #444; }
-        .article-section h2 { font-size: 1.4rem; color: #222; }
-
+        
         @media (max-width: 480px) { body { padding: 15px; } #app { padding: 20px; } }
     </style>
 </head>
@@ -87,7 +85,7 @@
 <div class="wrapper">
     <div id="app">
         <h1 class="header-title">Twibbon Generator</h1>
-        <p class="header-sub">Silakan pilih foto profil terbaik Anda</p>
+        <p class="header-sub" id="sub-msg">Silakan pilih foto profil</p>
         
         <div id="dynamic-content">
             </div>
@@ -95,13 +93,7 @@
 
     <div class="article-section">
         <h2>Cara Menggunakan Twibbon</h2>
-        <p>Twibbon adalah cara termudah untuk memberikan dukungan pada kampanye atau acara tertentu secara visual di media sosial. Dengan generator kami, Anda tidak perlu lagi menggunakan aplikasi edit foto yang rumit.</p>
-        <h3>Langkah-langkah:</h3>
-        <ul>
-            <li><strong>Unggah Foto:</strong> Klik area kotak di atas atau seret foto profil Anda.</li>
-            <li><strong>Proses Otomatis:</strong> Sistem kami akan memotong foto secara proporsional.</li>
-            <li><strong>Unduh & Bagikan:</strong> Klik tombol unduh dan foto siap digunakan.</li>
-        </ul>
+        <p>Twibbon adalah cara termudah untuk memberikan dukungan pada kampanye secara visual. Dengan generator kami, foto diproses secara lokal dan aman.</p>
     </div>
 </div>
 
