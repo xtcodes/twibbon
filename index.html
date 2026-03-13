@@ -20,7 +20,7 @@
         .header-title { font-size: 1.3rem; font-weight: 800; color: #2d3436; margin: 0 0 4px 0; }
         .header-sub { font-size: 0.95rem; color: #636e72; margin: 0 0 20px 0; }
         
-        /* Drop Area default dengan border */
+        /* Drop Area default */
         .drop-area-square {
             width: 100%; aspect-ratio: 1/1; background: #fafafa;
             border: 2px dashed #d1d8e0; border-radius: 12px;
@@ -29,8 +29,12 @@
             position: relative; box-sizing: border-box;
         }
         
-        /* Class ini dipanggil via JS untuk hapus border */
-        .drop-area-square.no-border { border: none !important; background: #fff; }
+        /* Drop Area saat gambar sudah ada (Mati/Tanpa Border) */
+        .drop-area-square.no-border { 
+            border: none !important; 
+            background: #fff; 
+            cursor: default; /* Kursor panah biasa, menandakan tidak bisa diklik */
+        }
         
         .status-overlay { display: flex; flex-direction: column; align-items: center; color: #888; }
         .status-overlay i { width: 48px; height: 48px; margin-bottom: 10px; }
@@ -62,10 +66,11 @@
 
     <div class="article-section">
         <h2>Cara Menggunakan Twibbon</h2>
-        <p>Twibbon adalah cara termudah untuk memberikan dukungan pada kampanye secara visual. Dengan generator kami, foto diproses secara lokal di browser Anda.</p>
+        <p>Twibbon adalah cara termudah untuk memberikan dukungan pada kampanye secara visual.</p>
         <ul>
-            <li>Klik kotak drop area untuk mengunggah foto profil Anda.</li>
-            <li>Tunggu sistem menggabungkan foto dengan bingkai twibbon.</li>
+            <li>Klik kotak area untuk mengunggah foto profil Anda.</li>
+            <li>Tunggu sistem menggabungkan foto dengan bingkai.</li>
+            <li>Gunakan tombol "Ganti Foto" jika ingin mengubah gambar.</li>
             <li>Klik tombol unduh untuk menyimpan hasil akhir.</li>
         </ul>
     </div>
