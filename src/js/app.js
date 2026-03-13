@@ -1,4 +1,4 @@
-// app.js
+//app.js
 let config;
 
 addEventListener('load', function() {  
@@ -13,16 +13,17 @@ addEventListener('load', function() {
 
 function initApp() {
     const container = document.getElementById('dynamic-content');
+    const subMsg = document.getElementById('sub-msg');
     
-    // Reset container (membersihkan sisa proses sebelumnya)
+    // Perbaikan: Kosongkan subtitle atas agar tidak double
+    subMsg.textContent = ""; 
     container.innerHTML = "";
 
-    // Buat Drop Area
     const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     
-    // Pesan awal hanya ada di dalam Drop Area
+    // Teks status "Silakan pilih..." hanya di sini (Drop Area)
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -55,7 +56,8 @@ function initApp() {
         const uiGroup = document.getElementById('ui-group');
         const zone = document.getElementById('drop-zone');
 
-        // UPDATE STATUS: Hanya di dalam drop area
+        // Perbaikan: Hapus update subMsg agar tidak muncul di atas
+        // Update status "Memproses..." hanya aktif di dalam drop area
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
             <span>${config.messages.status.processing}</span>
@@ -80,25 +82,20 @@ function initApp() {
                     gen.addLayer(overlayImg, { isOverlay: true });
                     const result = gen.render();
 
-                    // TAMPILKAN HASIL: Ganti isi Drop Area dengan gambar hasil
                     zone.classList.add('no-border'); 
                     zone.innerHTML = `<img src="${result}" class="preview-img">`;
                     
                     uiGroup.innerHTML = "";
                     uiGroup.style.display = 'flex';
 
-                    // Tombol Download
                     const btnDl = document.createElement('button');
                     btnDl.className = 'btn-download';
                     btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
                     btnDl.onclick = () => {
                         const a = document.createElement('a');
-                        a.href = result; 
-                        a.download = config.profilePictureName; 
-                        a.click();
+                        a.href = result; a.download = config.profilePictureName; a.click();
                     };
 
-                    // Tombol Reset (Ulangi)
                     const btnRe = document.createElement('button');
                     btnRe.className = 'btn-reset';
                     btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
