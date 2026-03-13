@@ -27,7 +27,7 @@ function initApp() {
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
-            <span>Ketuk untuk Unggah Foto</span>
+            <span>${config.messages.status.startup}</span>
         </div>
     `;
 
