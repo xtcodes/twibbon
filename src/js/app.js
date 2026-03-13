@@ -1,4 +1,3 @@
-//app.js fix
 let config;
 let generatorInstance;
 
@@ -7,23 +6,24 @@ addEventListener('load', function() {
         .then(res => res.json())
         .then(json => {
             config = json;
-            document.getElementById('main-title').textContent = config.appTitle;
+            // Menghapus baris pemanggilan main-title karena sudah tidak ada di HTML
             initApp();
         })
         .catch(err => console.error("Gagal memuat config:", err));
 });
 
 function initApp() {
+    // Menggunakan rootElementId dari config.json jika diperlukan, 
+    // namun di sini kita langsung target dynamic-content di dalam root tersebut
     const container = document.getElementById('dynamic-content');
-    const subMsg = document.getElementById('sub-msg');
-    
-    subMsg.textContent = config.messages.status.startup;
     container.innerHTML = "";
 
     // Buat elemen Drop Area
     const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
+    
+    // Pesan startup hanya muncul di sini (Drop Area)
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -48,7 +48,6 @@ function initApp() {
 
     lucide.createIcons();
 
-    // Event klik untuk upload
     dropArea.onclick = () => fileInput.click();
 
     fileInput.onchange = function() {
@@ -61,10 +60,9 @@ function initApp() {
         const zone = document.getElementById('drop-zone');
         const uiGroup = document.getElementById('ui-group');
 
-        // MATIKAN KLIK DROP AREA SEGERA (Cegah double upload)
+        // Ganti pesan di dalam drop zone saat memproses (opsional)
         zone.onclick = null; 
-        
-        subMsg.textContent = "Memproses...";
+        zone.innerHTML = `<div class="status-overlay"><span>${config.messages.status.processing}</span></div>`;
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -87,8 +85,7 @@ function initApp() {
                     generatorInstance.setUserImage(userImg);
                     generatorInstance.setOverlayImage(overlayImg);
 
-                    // Update UI
-                    subMsg.textContent = "Atur posisi foto Anda";
+                    // Tampilkan Tombol Kontrol
                     uiGroup.style.display = 'flex';
                     uiGroup.innerHTML = "";
 
