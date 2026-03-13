@@ -7,7 +7,7 @@ addEventListener('load', function() {
         .then(json => {
             config = json;
             // Set Header Identitas dari config
-            document.getElementById('title-text').textContent = config.appTitle || "Twibbon";
+            document.getElementById('title-text').textContent = config.appTitle || "";
             document.getElementById('subtitle-text').textContent = config.appSubtitle || "";
             initApp();
         })
