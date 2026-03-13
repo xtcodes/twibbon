@@ -1,4 +1,6 @@
 {
+	"appTitle": "Twibbon Campaign",
+	"appSubtitle": "Klik kotak di bawah untuk mulai membuat twibbon Anda",
 	"profilePictureName": "twibbon.png", 
 	"overlaySource": "assets/twibbon.png", 
 	"backgroundColor": "#ffffff", 
