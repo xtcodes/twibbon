@@ -14,46 +14,45 @@ function initApp() {
     const container = document.getElementById('dynamic-content');
     const subMsg = document.getElementById('sub-msg');
     
-    // Pastikan pesan awal dari config
+    // Reset pesan status
     subMsg.textContent = config.messages.status.startup;
     container.innerHTML = "";
 
-    // Buat ulang Drop Area
+    // 1. Buat Drop Area
     const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
-    
-    // Status UI di tengah drop area
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
             <span>${config.messages.status.startup}</span>
         </div>
     `;
-    container.appendChild(dropArea);
 
+    // 2. Buat Input File Tersembunyi
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
     fileInput.style.display = 'none';
-    container.appendChild(fileInput);
 
-    // Group tombol (Download & Reset)
+    // 3. Buat Container Tombol
     const btnGroup = document.createElement('div');
     btnGroup.className = 'btn-group';
     btnGroup.id = 'ui-group';
     btnGroup.style.display = 'none';
+
+    // Masukkan ke DOM
+    container.appendChild(dropArea);
+    container.appendChild(fileInput);
     container.appendChild(btnGroup);
 
     lucide.createIcons();
 
-    // Fungsi klik aktif di awal
+    // Event Klik Area (Aktif saat awal)
     dropArea.onclick = () => fileInput.click();
 
     fileInput.onchange = function() {
         if(this.files && this.files[0]) processImage(this.files[0]);
-        // Reset value agar file yang sama bisa dipilih lagi jika di-reset
-        this.value = ""; 
     };
 
     function processImage(file) {
@@ -62,7 +61,6 @@ function initApp() {
         const subMsg = document.getElementById('sub-msg');
         const zone = document.getElementById('drop-zone');
 
-        // Update status ke "Processing"
         subMsg.textContent = config.messages.status.processing;
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
@@ -70,6 +68,7 @@ function initApp() {
         `;
         lucide.createIcons();
 
+        // Simulasi loading sebentar agar transisi smooth
         setTimeout(() => {
             const overlayImg = new Image();
             overlayImg.src = config.overlaySource;
@@ -88,13 +87,17 @@ function initApp() {
                     gen.addLayer(overlayImg, { isOverlay: true });
                     const result = gen.render();
 
-                    // 1. TAMPILKAN HASIL & HAPUS BORDER
-                    zone.classList.add('no-border'); 
+                    // --- TAHAP PENGUNCIAN ---
+                    // 1. Hapus isi status, ganti dengan hasil gambar
                     zone.innerHTML = `<img src="${result}" class="preview-img">`;
                     
-                    // 2. MATIKAN FUNGSI KLIK (Agar tidak bisa dobel unggah)
-                    zone.onclick = null; 
+                    // 2. Tambahkan class 'no-border' (yg ada pointer-events: none)
+                    zone.classList.add('no-border'); 
                     
+                    // 3. Hapus listener klik via JS sebagai backup
+                    zone.onclick = null; 
+
+                    // Tampilkan Tombol
                     subMsg.textContent = config.messages.status.done;
                     uiGroup.innerHTML = "";
                     uiGroup.style.display = 'flex';
@@ -102,16 +105,16 @@ function initApp() {
                     // Tombol Download
                     const btnDl = document.createElement('button');
                     btnDl.className = 'btn-download';
-                    btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
+                    btnDl.innerHTML = `<i data-lucide="download"></i> Unduh Hasil`;
                     btnDl.onclick = () => {
                         const a = document.createElement('a');
                         a.href = result; a.download = config.profilePictureName; a.click();
                     };
 
-                    // Tombol Reset (Memanggil initApp untuk mengaktifkan kembali drop area)
+                    // Tombol Reset (Untuk mengaktifkan kembali drop area)
                     const btnRe = document.createElement('button');
                     btnRe.className = 'btn-reset';
-                    btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
+                    btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> Ganti Foto`;
                     btnRe.onclick = () => initApp(); 
 
                     uiGroup.appendChild(btnDl);
@@ -119,6 +122,6 @@ function initApp() {
                     lucide.createIcons();
                 };
             };
-        }, 150);
+        }, 300);
     }
 }
