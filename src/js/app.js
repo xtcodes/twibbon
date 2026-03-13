@@ -46,10 +46,14 @@ function initApp() {
     container.appendChild(btnGroup);
 
     lucide.createIcons();
+
+    // Fungsi klik aktif di awal
     dropArea.onclick = () => fileInput.click();
 
     fileInput.onchange = function() {
         if(this.files && this.files[0]) processImage(this.files[0]);
+        // Reset value agar file yang sama bisa dipilih lagi jika di-reset
+        this.value = ""; 
     };
 
     function processImage(file) {
@@ -84,9 +88,12 @@ function initApp() {
                     gen.addLayer(overlayImg, { isOverlay: true });
                     const result = gen.render();
 
-                    // TAMPILKAN HASIL: Hilangkan border, masukkan gambar
+                    // 1. TAMPILKAN HASIL & HAPUS BORDER
                     zone.classList.add('no-border'); 
                     zone.innerHTML = `<img src="${result}" class="preview-img">`;
+                    
+                    // 2. MATIKAN FUNGSI KLIK (Agar tidak bisa dobel unggah)
+                    zone.onclick = null; 
                     
                     subMsg.textContent = config.messages.status.done;
                     uiGroup.innerHTML = "";
@@ -101,7 +108,7 @@ function initApp() {
                         a.href = result; a.download = config.profilePictureName; a.click();
                     };
 
-                    // Tombol Reset
+                    // Tombol Reset (Memanggil initApp untuk mengaktifkan kembali drop area)
                     const btnRe = document.createElement('button');
                     btnRe.className = 'btn-reset';
                     btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
