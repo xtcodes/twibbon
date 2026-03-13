@@ -1,4 +1,3 @@
-//app.js
 let config;
 
 addEventListener('load', function() {  
@@ -15,15 +14,16 @@ function initApp() {
     const container = document.getElementById('dynamic-content');
     const subMsg = document.getElementById('sub-msg');
     
-    // Subtitle atas dijadikan teks statis agar tidak double saat proses
-    subMsg.textContent = "Silakan pilih foto terbaik Anda"; 
+    // Pastikan pesan awal dari config
+    subMsg.textContent = config.messages.status.startup;
     container.innerHTML = "";
 
+    // Buat ulang Drop Area
     const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     
-    // Teks status awal hanya di dalam drop area
+    // Status UI di tengah drop area
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -38,6 +38,7 @@ function initApp() {
     fileInput.style.display = 'none';
     container.appendChild(fileInput);
 
+    // Group tombol (Download & Reset)
     const btnGroup = document.createElement('div');
     btnGroup.className = 'btn-group';
     btnGroup.id = 'ui-group';
@@ -45,8 +46,6 @@ function initApp() {
     container.appendChild(btnGroup);
 
     lucide.createIcons();
-    
-    // Klik drop area aktif
     dropArea.onclick = () => fileInput.click();
 
     fileInput.onchange = function() {
@@ -56,10 +55,11 @@ function initApp() {
     function processImage(file) {
         const statusUI = document.getElementById('status-ui');
         const uiGroup = document.getElementById('ui-group');
+        const subMsg = document.getElementById('sub-msg');
         const zone = document.getElementById('drop-zone');
 
-        // PENTING: Jangan ubah subMsg.textContent di sini agar tidak double
-        // Hanya update status di dalam Drop Area
+        // Update status ke "Processing"
+        subMsg.textContent = config.messages.status.processing;
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
             <span>${config.messages.status.processing}</span>
@@ -84,15 +84,15 @@ function initApp() {
                     gen.addLayer(overlayImg, { isOverlay: true });
                     const result = gen.render();
 
-                    // Tampilkan hasil
+                    // TAMPILKAN HASIL: Hilangkan border, masukkan gambar
                     zone.classList.add('no-border'); 
                     zone.innerHTML = `<img src="${result}" class="preview-img">`;
                     
-                    // Drop area tetap bisa diklik untuk ganti foto sesuai keinginan Anda
-                    
+                    subMsg.textContent = config.messages.status.done;
                     uiGroup.innerHTML = "";
                     uiGroup.style.display = 'flex';
 
+                    // Tombol Download
                     const btnDl = document.createElement('button');
                     btnDl.className = 'btn-download';
                     btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
@@ -101,6 +101,7 @@ function initApp() {
                         a.href = result; a.download = config.profilePictureName; a.click();
                     };
 
+                    // Tombol Reset
                     const btnRe = document.createElement('button');
                     btnRe.className = 'btn-reset';
                     btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
