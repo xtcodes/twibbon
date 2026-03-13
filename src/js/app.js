@@ -1,5 +1,5 @@
 let config;
-let generatorInstance;
+let genInstance;
 
 addEventListener('load', function() {  
     fetch('config/config.json')
@@ -8,8 +8,7 @@ addEventListener('load', function() {
             config = json;
             document.getElementById('main-title').textContent = config.appTitle;
             initApp();
-        })
-        .catch(err => console.error("Gagal memuat config:", err));
+        });
 });
 
 function initApp() {
@@ -19,18 +18,16 @@ function initApp() {
     subMsg.textContent = config.messages.status.startup;
     container.innerHTML = "";
 
-    // Buat elemen Drop Area
     const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
-            <span>Pilih Foto</span>
+            <span>${config.messages.status.startup}</span>
         </div>
     `;
 
-    // Input file tersembunyi
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
@@ -47,65 +44,62 @@ function initApp() {
 
     lucide.createIcons();
 
-    // Event klik untuk upload
+    // Aktifkan klik upload di awal
     dropArea.onclick = () => fileInput.click();
 
     fileInput.onchange = function() {
-        if(this.files && this.files[0]) {
-            processImage(this.files[0]);
-        }
+        if(this.files && this.files[0]) processImage(this.files[0]);
     };
 
     function processImage(file) {
         const zone = document.getElementById('drop-zone');
         const uiGroup = document.getElementById('ui-group');
+        const statusUI = document.getElementById('status-ui');
 
-        // MATIKAN KLIK DROP AREA SEGERA (Cegah double upload)
+        // MATIKAN KLIK DROP AREA (Cegah dobel upload)
         zone.onclick = null; 
         
-        subMsg.textContent = "Memproses...";
+        subMsg.textContent = config.messages.status.processing;
+        statusUI.innerHTML = `<i data-lucide="loader-2" class="spinning"></i><span>${config.messages.status.processing}</span>`;
+        lucide.createIcons();
 
         const reader = new FileReader();
         reader.onload = (e) => {
             const userImg = new Image();
             userImg.src = e.target.result;
-
             userImg.onload = () => {
                 const overlayImg = new Image();
                 overlayImg.src = config.overlaySource;
-
                 overlayImg.onload = () => {
-                    // Siapkan Canvas
+                    // Masuk ke mode interaktif
                     zone.classList.add('no-border');
                     zone.innerHTML = "";
                     const canvas = document.createElement('canvas');
                     zone.appendChild(canvas);
 
-                    // Jalankan Generator Interaktif
-                    generatorInstance = new Generator(canvas, { width: 1080, height: 1080 });
-                    generatorInstance.setUserImage(userImg);
-                    generatorInstance.setOverlayImage(overlayImg);
+                    genInstance = new Generator(canvas);
+                    genInstance.setUserImage(userImg);
+                    genInstance.setOverlayImage(overlayImg);
 
-                    // Update UI
-                    subMsg.textContent = "Atur posisi foto Anda";
+                    subMsg.textContent = config.messages.status.done;
                     uiGroup.style.display = 'flex';
                     uiGroup.innerHTML = "";
 
                     // Tombol Unduh
                     const btnDl = document.createElement('button');
                     btnDl.className = 'btn-download';
-                    btnDl.innerHTML = `<i data-lucide="download"></i> Unduh`;
+                    btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
                     btnDl.onclick = () => {
                         const link = document.createElement('a');
                         link.download = config.profilePictureName || "twibbon.png";
-                        link.href = generatorInstance.render();
+                        link.href = genInstance.render();
                         link.click();
                     };
 
                     // Tombol Reset
                     const btnRe = document.createElement('button');
                     btnRe.className = 'btn-reset';
-                    btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> Ganti`;
+                    btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
                     btnRe.onclick = () => initApp(); 
 
                     uiGroup.appendChild(btnDl);
