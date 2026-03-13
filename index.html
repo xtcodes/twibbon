@@ -20,7 +20,7 @@
         .header-title { font-size: 1.3rem; font-weight: 800; color: #2d3436; margin: 0 0 4px 0; }
         .header-sub { font-size: 0.95rem; color: #636e72; margin: 0 0 20px 0; }
         
-        /* Drop Area default */
+        /* Drop Area Aktif */
         .drop-area-square {
             width: 100%; aspect-ratio: 1/1; background: #fafafa;
             border: 2px dashed #d1d8e0; border-radius: 12px;
@@ -29,11 +29,12 @@
             position: relative; box-sizing: border-box;
         }
         
-        /* Drop Area saat gambar sudah ada (Mati/Tanpa Border) */
+        /* Area ini akan MEMATIKAN semua interaksi klik saat gambar sudah muncul */
         .drop-area-square.no-border { 
             border: none !important; 
             background: #fff; 
-            cursor: default; /* Kursor panah biasa, menandakan tidak bisa diklik */
+            cursor: default; 
+            pointer-events: none; /* Kunci mati: Klik tidak akan masuk ke elemen ini */
         }
         
         .status-overlay { display: flex; flex-direction: column; align-items: center; color: #888; }
@@ -43,6 +44,8 @@
         
         .preview-img { width: 100%; height: 100%; object-fit: contain; display: block; }
         .btn-group { display: flex; gap: 12px; }
+        
+        /* Tombol tetap bisa diklik karena berada di luar drop-area-square */
         button {
             flex: 1; padding: 14px; border: none; border-radius: 10px;
             font-size: 14px; font-weight: 700; cursor: pointer;
@@ -66,12 +69,12 @@
 
     <div class="article-section">
         <h2>Cara Menggunakan Twibbon</h2>
-        <p>Twibbon adalah cara termudah untuk memberikan dukungan pada kampanye secara visual.</p>
+        <p>Gunakan generator ini untuk membuat foto profil kampanye Anda secara otomatis.</p>
         <ul>
-            <li>Klik kotak area untuk mengunggah foto profil Anda.</li>
-            <li>Tunggu sistem menggabungkan foto dengan bingkai.</li>
-            <li>Gunakan tombol "Ganti Foto" jika ingin mengubah gambar.</li>
-            <li>Klik tombol unduh untuk menyimpan hasil akhir.</li>
+            <li>Klik area kotak untuk memilih foto.</li>
+            <li>Hasil akan muncul otomatis.</li>
+            <li>Gunakan tombol <b>Ganti Foto</b> jika ingin mengulang.</li>
+            <li>Klik <b>Unduh Hasil</b> untuk menyimpan.</li>
         </ul>
     </div>
 </div>
