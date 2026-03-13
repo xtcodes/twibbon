@@ -9,43 +9,33 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background-color: #f0f2f5; margin: 0; padding: 0;
-            display: flex; flex-direction: column; align-items: center; box-sizing: border-box;
+            background-color: #f0f2f5; margin: 0; padding: 20px;
+            display: flex; justify-content: center; box-sizing: border-box; flex-direction: column; align-items: center;
         }
-
-        /* Header Baru sebagai Identitas Web */
-        .site-header {
-            width: 100%; background: #ffffff; padding: 15px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            text-align: center; margin-bottom: 20px;
-        }
-        .brand-name { font-weight: 900; color: #4a90e2; font-size: 1.5rem; letter-spacing: -1px; margin: 0; }
+        /* CSS Tambahan untuk Header Identitas Web */
+        .web-identity { text-align: center; margin-bottom: 20px; width: 100%; max-width: 480px; }
+        .web-identity h1 { margin: 0; font-size: 1.8rem; color: #4a90e2; font-weight: 900; letter-spacing: -1px; }
         
-        .wrapper { width: 100%; max-width: 480px; padding: 0 20px 40px 20px; box-sizing: border-box; }
-        
+        .wrapper { width: 100%; max-width: 480px; }
         #app {
             background: #fff; padding: 24px; border-radius: 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; margin-bottom: 25px;
         }
-
-        /* Judul Campaign Tetap Statis */
-        .header-title { font-size: 1.3rem; font-weight: 800; color: #2d3436; margin: 0 0 5px 0; }
-        .header-tagline { font-size: 0.9rem; color: #636e72; margin: 0 0 20px 0; opacity: 0.8; }
+        .header-title { font-size: 1.3rem; font-weight: 800; color: #2d3436; margin: 0 0 4px 0; }
+        .header-sub { font-size: 0.95rem; color: #636e72; margin: 0 0 20px 0; }
         
         .drop-area-square {
             width: 100%; aspect-ratio: 1/1; background: #fafafa;
             border: 2px dashed #d1d8e0; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; overflow: hidden; margin-bottom: 20px;
-            position: relative; box-sizing: border-box; transition: all 0.3s ease;
+            position: relative; box-sizing: border-box;
         }
-        .drop-area-square:hover { border-color: #4a90e2; background: #f0f7ff; }
+        
         .drop-area-square.no-border { border: none !important; background: #fff; }
         
-        .status-overlay { display: flex; flex-direction: column; align-items: center; color: #888; padding: 20px; }
-        .status-overlay i { width: 44px; height: 44px; margin-bottom: 12px; }
-        .status-overlay span { font-size: 0.95rem; font-weight: 500; }
-        
+        .status-overlay { display: flex; flex-direction: column; align-items: center; color: #888; }
+        .status-overlay i { width: 48px; height: 48px; margin-bottom: 10px; }
         .spinning { animation: spin 1s linear infinite; color: #4a90e2; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
@@ -55,42 +45,39 @@
             flex: 1; padding: 14px; border: none; border-radius: 10px;
             font-size: 14px; font-weight: 700; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: opacity 0.2s;
         }
-        button:active { opacity: 0.8; }
         .btn-download { background: #00b894; color: white; }
         .btn-reset { background: #f1f2f6; color: #2d3436; }
 
         .article-section { text-align: left; line-height: 1.8; color: #2d3436; background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .article-section h2 { font-size: 1.2rem; margin-top: 0; color: #2d3436; }
-        .article-section ul { padding-left: 18px; font-size: 0.95rem; color: #636e72; }
+        .article-section h2 { font-size: 1.4rem; margin-top: 0; }
+        .article-section ul { padding-left: 18px; }
     </style>
 </head>
 <body>
-
-<!-- Header Identitas Web -->
-<header class="site-header">
-    <h1 class="brand-name">TWIBBON<span style="color: #2d3436;">APP</span></h1>
-</header>
+<!-- HEADER IDENTITAS WEB -->
+<div class="web-identity">
+    <h1>TWIBBON APP</h1>
+</div>
 
 <div class="wrapper">
     <div id="app">
-        <h2 class="header-title" id="main-title">Memuat...</h2>
-        <p class="header-tagline">Unggah foto Anda untuk membuat twibbon otomatis</p>
-        
+        <h1 class="header-title" id="main-title"></h1>
+        <!-- Subtitle ini dikosongkan lewat JS agar tidak double -->
+        <p class="header-sub" id="sub-msg"></p>
         <div id="dynamic-content"></div>
     </div>
 
     <div class="article-section">
-        <h2>Cara Menggunakan</h2>
+        <h2>Cara Menggunakan Twibbon</h2>
+        <p>Twibbon adalah cara termudah untuk memberikan dukungan pada kampanye secara visual. Dengan generator kami, foto diproses secara lokal di browser Anda.</p>
         <ul>
-            <li>Klik kotak drop area untuk memilih foto terbaik Anda.</li>
-            <li>Tunggu sebentar saat sistem memproses foto secara otomatis.</li>
-            <li>Setelah muncul, tekan tombol <b>Unduh</b> untuk menyimpan.</li>
+            <li>Klik kotak drop area untuk mengunggah foto profil Anda.</li>
+            <li>Tunggu sistem menggabungkan foto dengan bingkai twibbon.</li>
+            <li>Klik tombol unduh untuk menyimpan hasil akhir.</li>
         </ul>
     </div>
 </div>
-
 <script src="src/js/index.js"></script>
 <script src="src/js/app.js"></script>
 </body>
