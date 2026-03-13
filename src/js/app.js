@@ -1,3 +1,4 @@
+// app.js
 let config;
 
 addEventListener('load', function() {  
@@ -12,18 +13,16 @@ addEventListener('load', function() {
 
 function initApp() {
     const container = document.getElementById('dynamic-content');
-    const subMsg = document.getElementById('sub-msg');
     
-    // Pastikan pesan awal dari config
-    subMsg.textContent = config.messages.status.startup;
+    // Reset container (membersihkan sisa proses sebelumnya)
     container.innerHTML = "";
 
-    // Buat ulang Drop Area
+    // Buat Drop Area
     const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     
-    // Status UI di tengah drop area
+    // Pesan awal hanya ada di dalam Drop Area
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -38,7 +37,6 @@ function initApp() {
     fileInput.style.display = 'none';
     container.appendChild(fileInput);
 
-    // Group tombol (Download & Reset)
     const btnGroup = document.createElement('div');
     btnGroup.className = 'btn-group';
     btnGroup.id = 'ui-group';
@@ -55,11 +53,9 @@ function initApp() {
     function processImage(file) {
         const statusUI = document.getElementById('status-ui');
         const uiGroup = document.getElementById('ui-group');
-        const subMsg = document.getElementById('sub-msg');
         const zone = document.getElementById('drop-zone');
 
-        // Update status ke "Processing"
-        subMsg.textContent = config.messages.status.processing;
+        // UPDATE STATUS: Hanya di dalam drop area
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
             <span>${config.messages.status.processing}</span>
@@ -84,11 +80,10 @@ function initApp() {
                     gen.addLayer(overlayImg, { isOverlay: true });
                     const result = gen.render();
 
-                    // TAMPILKAN HASIL: Hilangkan border, masukkan gambar
+                    // TAMPILKAN HASIL: Ganti isi Drop Area dengan gambar hasil
                     zone.classList.add('no-border'); 
                     zone.innerHTML = `<img src="${result}" class="preview-img">`;
                     
-                    subMsg.textContent = config.messages.status.done;
                     uiGroup.innerHTML = "";
                     uiGroup.style.display = 'flex';
 
@@ -98,10 +93,12 @@ function initApp() {
                     btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
                     btnDl.onclick = () => {
                         const a = document.createElement('a');
-                        a.href = result; a.download = config.profilePictureName; a.click();
+                        a.href = result; 
+                        a.download = config.profilePictureName; 
+                        a.click();
                     };
 
-                    // Tombol Reset
+                    // Tombol Reset (Ulangi)
                     const btnRe = document.createElement('button');
                     btnRe.className = 'btn-reset';
                     btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
