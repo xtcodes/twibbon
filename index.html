@@ -10,12 +10,13 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #f0f2f5; margin: 0; padding: 20px;
-            display: flex; justify-content: center; box-sizing: border-box; flex-direction: column; align-items: center;
+            display: flex; flex-direction: column; align-items: center; box-sizing: border-box;
         }
-        /* CSS Tambahan untuk Header Identitas Web */
-        .web-identity { text-align: center; margin-bottom: 20px; width: 100%; max-width: 480px; }
-        .web-identity h1 { margin: 0; font-size: 1.8rem; color: #4a90e2; font-weight: 900; letter-spacing: -1px; }
         
+        /* Header Identitas Web */
+        .web-header { width: 100%; max-width: 480px; text-align: center; margin-bottom: 15px; }
+        .web-header h1 { margin: 0; color: #4a90e2; font-size: 1.5rem; font-weight: 900; }
+
         .wrapper { width: 100%; max-width: 480px; }
         #app {
             background: #fff; padding: 24px; border-radius: 20px;
@@ -32,7 +33,7 @@
             position: relative; box-sizing: border-box;
         }
         
-        .drop-area-square.no-border { border: none !important; background: #fff; }
+        .drop-area-square.no-border { border: none !important; background: #fff; cursor: default; }
         
         .status-overlay { display: flex; flex-direction: column; align-items: center; color: #888; }
         .status-overlay i { width: 48px; height: 48px; margin-bottom: 10px; }
@@ -55,16 +56,15 @@
     </style>
 </head>
 <body>
-<!-- HEADER IDENTITAS WEB -->
-<div class="web-identity">
-    <h1>TWIBBON APP</h1>
+
+<div class="web-header">
+    <h1>TWIBBON GENERATOR</h1>
 </div>
 
 <div class="wrapper">
     <div id="app">
         <h1 class="header-title" id="main-title"></h1>
-        <!-- Subtitle ini dikosongkan lewat JS agar tidak double -->
-        <p class="header-sub" id="sub-msg"></p>
+        <p class="header-sub" id="sub-msg"></p> <!-- Akan dikosongkan via JS saat proses -->
         <div id="dynamic-content"></div>
     </div>
 
