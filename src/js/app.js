@@ -15,15 +15,15 @@ function initApp() {
     const container = document.getElementById('dynamic-content');
     const subMsg = document.getElementById('sub-msg');
     
-    // Hilangkan teks subtitle atas agar tidak double
-    subMsg.textContent = ""; 
+    // Subtitle atas dijadikan teks statis agar tidak double saat proses
+    subMsg.textContent = "Silakan pilih foto terbaik Anda"; 
     container.innerHTML = "";
 
     const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     
-    // Teks instruksi hanya muncul di sini
+    // Teks status awal hanya di dalam drop area
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -46,7 +46,7 @@ function initApp() {
 
     lucide.createIcons();
     
-    // Aktifkan klik hanya di awal
+    // Klik drop area aktif
     dropArea.onclick = () => fileInput.click();
 
     fileInput.onchange = function() {
@@ -58,7 +58,8 @@ function initApp() {
         const uiGroup = document.getElementById('ui-group');
         const zone = document.getElementById('drop-zone');
 
-        // Update status "Memproses" hanya di dalam kotak
+        // PENTING: Jangan ubah subMsg.textContent di sini agar tidak double
+        // Hanya update status di dalam Drop Area
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
             <span>${config.messages.status.processing}</span>
@@ -83,12 +84,11 @@ function initApp() {
                     gen.addLayer(overlayImg, { isOverlay: true });
                     const result = gen.render();
 
-                    // TAMPILKAN HASIL
+                    // Tampilkan hasil
                     zone.classList.add('no-border'); 
                     zone.innerHTML = `<img src="${result}" class="preview-img">`;
                     
-                    // PENTING: Matikan fungsi klik galeri setelah gambar jadi
-                    zone.onclick = null; 
+                    // Drop area tetap bisa diklik untuk ganti foto sesuai keinginan Anda
                     
                     uiGroup.innerHTML = "";
                     uiGroup.style.display = 'flex';
