@@ -1,13 +1,13 @@
 {
 	"appTitle": "Twibbon Campaign",
-	"appSubtitle": "Ketuk untuk Unggah Foto",
+	"appSubtitle": "Silakan pilih foto terbaik Anda",
 	"profilePictureName": "twibbon.png", 
 	"overlaySource": "assets/twibbon.png", 
 	"backgroundColor": "#ffffff", 
 	"rootElementId": "app", 
 	"messages": {
 		"status": {
-			"startup": "Silakan pilih foto terbaik Anda", 
+			"startup": "Ketuk untuk Unggah Foto", 
 			"uploading": "Mengimpor berkas, mohon tunggu...", 
 			"processing": "Memproses berkas, mohon tunggu...", 
 			"done": "Selesai! Twibbon berhasil dibuat"
