@@ -15,7 +15,7 @@ function initApp() {
     const container = document.getElementById('dynamic-content');
     const subMsg = document.getElementById('sub-msg');
     
-    // Perbaikan: Kosongkan subtitle atas agar tidak double
+    // Hilangkan teks subtitle atas agar tidak double
     subMsg.textContent = ""; 
     container.innerHTML = "";
 
@@ -23,7 +23,7 @@ function initApp() {
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     
-    // Teks status "Silakan pilih..." hanya di sini (Drop Area)
+    // Teks instruksi hanya muncul di sini
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -45,6 +45,8 @@ function initApp() {
     container.appendChild(btnGroup);
 
     lucide.createIcons();
+    
+    // Aktifkan klik hanya di awal
     dropArea.onclick = () => fileInput.click();
 
     fileInput.onchange = function() {
@@ -56,8 +58,7 @@ function initApp() {
         const uiGroup = document.getElementById('ui-group');
         const zone = document.getElementById('drop-zone');
 
-        // Perbaikan: Hapus update subMsg agar tidak muncul di atas
-        // Update status "Memproses..." hanya aktif di dalam drop area
+        // Update status "Memproses" hanya di dalam kotak
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
             <span>${config.messages.status.processing}</span>
@@ -82,8 +83,12 @@ function initApp() {
                     gen.addLayer(overlayImg, { isOverlay: true });
                     const result = gen.render();
 
+                    // TAMPILKAN HASIL
                     zone.classList.add('no-border'); 
                     zone.innerHTML = `<img src="${result}" class="preview-img">`;
+                    
+                    // PENTING: Matikan fungsi klik galeri setelah gambar jadi
+                    zone.onclick = null; 
                     
                     uiGroup.innerHTML = "";
                     uiGroup.style.display = 'flex';
