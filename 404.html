@@ -2,91 +2,100 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>404 - Halaman Tidak Ditemukan</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
+            background-color: #f0f2f5; 
+            margin: 0; 
             padding: 20px;
-            display: flex;
+            display: flex; 
+            justify-content: center; 
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
             box-sizing: border-box;
-            color: #2d3436;
         }
 
-        .container {
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            background: #fff;
-            padding: 40px 24px;
+        /* Samakan dengan Wrapper index.html */
+        .wrapper { 
+            width: 100%; 
+            max-width: 480px; 
+        }
+
+        /* Samakan dengan Card #app di index.html */
+        .card {
+            background: #fff; 
+            padding: 40px 24px; 
             border-radius: 24px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+            text-align: center;
         }
 
-        .error-code {
-            font-size: 5rem;
-            font-weight: 900;
-            margin: 0;
-            color: #dfe6e9;
-            line-height: 1;
-        }
-
-        .icon-box {
+        /* Icon dibuat besar dan berwarna lembut */
+        .icon-container {
             background: #fff5f5;
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: -40px auto 20px;
+            margin: 0 auto 24px auto;
             color: #ff7675;
-            box-shadow: 0 4px 10px rgba(255, 118, 117, 0.2);
+        }
+
+        /* Memastikan ukuran icon Lucide besar (48px) */
+        .icon-container svg {
+            width: 48px;
+            height: 48px;
         }
 
         h1 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            font-weight: 800;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #2d3436;
+            margin: 0 0 10px 0;
+        }
+
+        .error-code {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #b2bec3;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: block;
         }
 
         p {
             font-size: 1rem;
             color: #636e72;
-            line-height: 1.5;
-            margin-bottom: 30px;
+            line-height: 1.6;
+            margin: 0 0 32px 0;
         }
 
-        .btn-home {
-            display: inline-flex;
+        /* Gaya tombol disamakan dengan btn-download */
+        .btn-back {
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             background-color: #00b894;
             color: white;
             text-decoration: none;
-            padding: 14px 28px;
+            padding: 16px;
             border-radius: 12px;
             font-weight: 700;
-            font-size: 1rem;
-            transition: transform 0.2s, background-color 0.2s;
+            font-size: 15px;
+            transition: transform 0.1s;
         }
 
-        .btn-home:hover {
-            background-color: #00a383;
+        .btn-back:active {
+            transform: scale(0.98);
         }
 
-        .btn-home:active {
-            transform: scale(0.95);
-        }
-
-        i {
+        .btn-back i {
             width: 20px;
             height: 20px;
         }
@@ -94,18 +103,22 @@
 </head>
 <body>
 
-<div class="container">
-    <div class="icon-box">
-        <i data-lucide="map-pin-off"></i>
+<div class="wrapper">
+    <div class="card">
+        <div class="icon-container">
+            <!-- Menggunakan icon search agar lebih relevan dengan 'mencari' halaman -->
+            <i data-lucide="search-x"></i>
+        </div>
+        
+        <span class="error-code">ERROR 404</span>
+        <h1>Waduh, Nyasar Ya?</h1>
+        <p>Halaman yang Anda cari tidak ditemukan atau mungkin sudah pindah alamat.</p>
+        
+        <a href="index.html" class="btn-back">
+            <i data-lucide="home"></i>
+            Kembali ke Beranda
+        </a>
     </div>
-    <h1 class="error-code">404</h1>
-    <h1>Waduh, Nyasar Ya?</h1>
-    <p>Halaman yang Anda cari tidak ada atau mungkin sudah pindah ke tempat lain.</p>
-    
-    <a href="index.html" class="btn-home">
-        <i data-lucide="home"></i>
-        Kembali ke Beranda
-    </a>
 </div>
 
 <script>
