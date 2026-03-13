@@ -6,16 +6,19 @@ addEventListener('load', function() {
         .then(res => res.json())
         .then(json => {
             config = json;
-            // Menghapus baris pemanggilan main-title karena sudah tidak ada di HTML
+            // Set Header Identitas dari config
+            document.getElementById('title-text').textContent = config.appTitle || "Twibbon";
+            document.getElementById('subtitle-text').textContent = config.appSubtitle || "";
             initApp();
         })
         .catch(err => console.error("Gagal memuat config:", err));
 });
 
 function initApp() {
-    // Menggunakan rootElementId dari config.json jika diperlukan, 
-    // namun di sini kita langsung target dynamic-content di dalam root tersebut
+    // Menggunakan rootElementId dari config ("app")
+    const root = document.getElementById(config.rootElementId);
     const container = document.getElementById('dynamic-content');
+    
     container.innerHTML = "";
 
     // Buat elemen Drop Area
@@ -23,7 +26,7 @@ function initApp() {
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     
-    // Pesan startup hanya muncul di sini (Drop Area)
+    // Pesan startup hanya di dalam kotak (Drop Area)
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -31,7 +34,6 @@ function initApp() {
         </div>
     `;
 
-    // Input file tersembunyi
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
@@ -60,7 +62,6 @@ function initApp() {
         const zone = document.getElementById('drop-zone');
         const uiGroup = document.getElementById('ui-group');
 
-        // Ganti pesan di dalam drop zone saat memproses (opsional)
         zone.onclick = null; 
         zone.innerHTML = `<div class="status-overlay"><span>${config.messages.status.processing}</span></div>`;
 
@@ -74,18 +75,15 @@ function initApp() {
                 overlayImg.src = config.overlaySource;
 
                 overlayImg.onload = () => {
-                    // Siapkan Canvas
                     zone.classList.add('no-border');
                     zone.innerHTML = "";
                     const canvas = document.createElement('canvas');
                     zone.appendChild(canvas);
 
-                    // Jalankan Generator Interaktif
                     generatorInstance = new Generator(canvas, { width: 1080, height: 1080 });
                     generatorInstance.setUserImage(userImg);
                     generatorInstance.setOverlayImage(overlayImg);
 
-                    // Tampilkan Tombol Kontrol
                     uiGroup.style.display = 'flex';
                     uiGroup.innerHTML = "";
 
@@ -95,7 +93,7 @@ function initApp() {
                     btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
                     btnDl.onclick = () => {
                         const link = document.createElement('a');
-                        link.download = config.profilePictureName || "twibbon.png";
+                        link.download = config.profilePictureName;
                         link.href = generatorInstance.render();
                         link.click();
                     };
