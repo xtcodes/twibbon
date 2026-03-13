@@ -14,16 +14,13 @@ function initApp() {
     const container = document.getElementById('dynamic-content');
     const subMsg = document.getElementById('sub-msg');
     
-    // Pastikan pesan awal dari config
     subMsg.textContent = config.messages.status.startup;
     container.innerHTML = "";
 
-    // Buat ulang Drop Area
     const dropArea = document.createElement('div');
     dropArea.className = 'drop-area-square';
     dropArea.id = 'drop-zone';
     
-    // Status UI di tengah drop area
     dropArea.innerHTML = `
         <div class="status-overlay" id="status-ui">
             <i data-lucide="image-plus"></i>
@@ -38,7 +35,6 @@ function initApp() {
     fileInput.style.display = 'none';
     container.appendChild(fileInput);
 
-    // Group tombol (Download & Reset)
     const btnGroup = document.createElement('div');
     btnGroup.className = 'btn-group';
     btnGroup.id = 'ui-group';
@@ -46,6 +42,8 @@ function initApp() {
     container.appendChild(btnGroup);
 
     lucide.createIcons();
+    
+    // Aktifkan klik hanya di awal
     dropArea.onclick = () => fileInput.click();
 
     fileInput.onchange = function() {
@@ -58,7 +56,6 @@ function initApp() {
         const subMsg = document.getElementById('sub-msg');
         const zone = document.getElementById('drop-zone');
 
-        // Update status ke "Processing"
         subMsg.textContent = config.messages.status.processing;
         statusUI.innerHTML = `
             <i data-lucide="loader-2" class="spinning"></i>
@@ -84,7 +81,11 @@ function initApp() {
                     gen.addLayer(overlayImg, { isOverlay: true });
                     const result = gen.render();
 
-                    // TAMPILKAN HASIL: Hilangkan border, masukkan gambar
+                    // 1. Matikan fungsi klik pada area gambar (PENTING)
+                    zone.onclick = null; 
+                    zone.style.cursor = 'default';
+                    
+                    // 2. Hilangkan border & tampilkan hasil
                     zone.classList.add('no-border'); 
                     zone.innerHTML = `<img src="${result}" class="preview-img">`;
                     
@@ -112,6 +113,6 @@ function initApp() {
                     lucide.createIcons();
                 };
             };
-        }, 150);
+        }, 300);
     }
 }
