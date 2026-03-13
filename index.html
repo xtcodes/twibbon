@@ -11,6 +11,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #f0f2f5; margin: 0; padding: 20px;
             display: flex; justify-content: center; box-sizing: border-box;
+            touch-action: manipulation;
         }
         .wrapper { width: 100%; max-width: 480px; }
         #app {
@@ -20,32 +21,28 @@
         .header-title { font-size: 1.3rem; font-weight: 800; color: #2d3436; margin: 0 0 4px 0; }
         .header-sub { font-size: 0.95rem; color: #636e72; margin: 0 0 20px 0; }
         
-        /* Drop Area Aktif */
         .drop-area-square {
             width: 100%; aspect-ratio: 1/1; background: #fafafa;
             border: 2px dashed #d1d8e0; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; overflow: hidden; margin-bottom: 20px;
             position: relative; box-sizing: border-box;
+            touch-action: none; /* Penting agar browser tidak scroll saat geser gambar */
         }
         
-        /* Area ini akan MEMATIKAN semua interaksi klik saat gambar sudah muncul */
+        /* State saat gambar sudah ada: matikan cursor pointer & hilangkan border */
         .drop-area-square.no-border { 
             border: none !important; 
-            background: #fff; 
+            background: #000; 
             cursor: default; 
-            pointer-events: none; /* Kunci mati: Klik tidak akan masuk ke elemen ini */
         }
         
-        .status-overlay { display: flex; flex-direction: column; align-items: center; color: #888; }
+        .status-overlay { display: flex; flex-direction: column; align-items: center; color: #888; pointer-events: none; }
         .status-overlay i { width: 48px; height: 48px; margin-bottom: 10px; }
-        .spinning { animation: spin 1s linear infinite; color: #4a90e2; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
         
-        .preview-img { width: 100%; height: 100%; object-fit: contain; display: block; }
-        .btn-group { display: flex; gap: 12px; }
-        
-        /* Tombol tetap bisa diklik karena berada di luar drop-area-square */
+        canvas { width: 100%; height: 100%; display: block; }
+
+        .btn-group { display: flex; gap: 12px; margin-top: 10px; }
         button {
             flex: 1; padding: 14px; border: none; border-radius: 10px;
             font-size: 14px; font-weight: 700; cursor: pointer;
@@ -62,19 +59,18 @@
 <body>
 <div class="wrapper">
     <div id="app">
-        <h1 class="header-title" id="main-title"></h1>
-        <p class="header-sub" id="sub-msg"></p>
+        <h1 class="header-title" id="main-title">Twibbon</h1>
+        <p class="header-sub" id="sub-msg">Memuat...</p>
         <div id="dynamic-content"></div>
     </div>
 
     <div class="article-section">
-        <h2>Cara Menggunakan Twibbon</h2>
-        <p>Gunakan generator ini untuk membuat foto profil kampanye Anda secara otomatis.</p>
+        <h2>Instruksi</h2>
         <ul>
-            <li>Klik area kotak untuk memilih foto.</li>
-            <li>Hasil akan muncul otomatis.</li>
-            <li>Gunakan tombol <b>Ganti Foto</b> jika ingin mengulang.</li>
-            <li>Klik <b>Unduh Hasil</b> untuk menyimpan.</li>
+            <li>Klik kotak untuk unggah foto.</li>
+            <li>Geser dengan 1 jari untuk mengatur posisi.</li>
+            <li>Cubit (Pinch) dengan 2 jari untuk memperbesar/kecil.</li>
+            <li>Klik Unduh jika sudah selesai.</li>
         </ul>
     </div>
 </div>
