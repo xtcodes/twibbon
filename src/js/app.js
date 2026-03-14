@@ -1,58 +1,73 @@
 let config;
 let generatorInstance;
 
-const container = document.getElementById('dynamic-content');
-const titleText = document.getElementById('title-text');
-const subtitleText = document.getElementById('subtitle-text');
-const dropZone = document.getElementById('drop-zone');
-const startupMsg = document.getElementById('startup-msg');
-const fileInput = document.getElementById('file-input');
-const uiGroup = document.getElementById('ui-group');
-
 addEventListener('load', function() {  
     fetch('config/config.json')
         .then(res => res.json())
         .then(json => {
             config = json;
-            
-            // Set konten teks
-            titleText.textContent = config.appTitle;
-            subtitleText.textContent = config.appSubtitle;
-            startupMsg.textContent = config.messages.status.startup;
-            
-            // Berikan efek fade-in hanya sekali saat pertama dimuat
-            container.classList.add('fade-in');
-            document.querySelector('.header-identity').classList.add('fade-in');
-            
-            lucide.createIcons();
-            initAppLogic();
+            document.getElementById('title-text').textContent = config.appTitle;
+            document.getElementById('subtitle-text').textContent = config.appSubtitle;
+            initApp(true); // true = pemuatan pertama (tanpa delay reset)
         })
         .catch(err => console.error("Gagal memuat config:", err));
 });
 
-function initAppLogic() {
-    // Kembalikan ke keadaan awal tanpa 'transition' berat
-    dropZone.classList.remove('no-border');
-    dropZone.innerHTML = `
-        <div class="status-overlay">
-            <i data-lucide="image-plus"></i>
-            <span>${config.messages.status.startup}</span>
-        </div>
-    `;
-    lucide.createIcons();
+function initApp(firstLoad = false) {
+    const container = document.getElementById('dynamic-content');
     
-    uiGroup.style.display = 'none';
-    uiGroup.innerHTML = "";
-    dropZone.onclick = () => fileInput.click();
+    // 1. Sembunyikan konten lama dengan halus
+    container.classList.remove('fade-active');
 
-    fileInput.onchange = function() {
-        if(this.files && this.files[0]) processImage(this.files[0]);
-    };
+    setTimeout(() => {
+        container.innerHTML = "";
+        
+        // 2. Siapkan elemen baru
+        const dropArea = document.createElement('div');
+        dropArea.className = 'drop-area-square';
+        dropArea.id = 'drop-zone';
+        dropArea.innerHTML = `
+            <div class="status-overlay">
+                <i data-lucide="image-plus"></i>
+                <span>${config.messages.status.startup}</span>
+            </div>
+        `;
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'btn-group';
+        btnGroup.id = 'ui-group';
+        btnGroup.style.display = 'none';
+
+        container.appendChild(dropArea);
+        container.appendChild(fileInput);
+        container.appendChild(btnGroup);
+
+        lucide.createIcons();
+
+        // 3. Tampilkan kembali dengan efek Fade In
+        requestAnimationFrame(() => {
+            container.classList.add('fade-active');
+        });
+
+        dropArea.onclick = () => fileInput.click();
+        fileInput.onchange = function() {
+            if(this.files && this.files[0]) processImage(this.files[0]);
+        };
+    }, firstLoad ? 0 : 200); 
 }
 
 function processImage(file) {
-    dropZone.onclick = null; 
-    dropZone.innerHTML = `
+    const zone = document.getElementById('drop-zone');
+    const uiGroup = document.getElementById('ui-group');
+
+    // Feedback saat memproses
+    zone.onclick = null; 
+    zone.innerHTML = `
         <div class="status-overlay">
             <i data-lucide="loader-2" class="spin"></i>
             <span>${config.messages.status.processing}</span>
@@ -70,19 +85,16 @@ function processImage(file) {
             overlayImg.src = config.overlaySource;
 
             overlayImg.onload = () => {
-                // Bersihkan zone dan pasang canvas
-                dropZone.classList.add('no-border');
-                dropZone.innerHTML = "";
+                zone.classList.add('no-border');
+                zone.innerHTML = "";
                 
                 const canvas = document.createElement('canvas');
-                dropZone.appendChild(canvas);
+                zone.appendChild(canvas);
 
-                // Inisialisasi Generator (Interaksi harus ringan di sini)
                 generatorInstance = new Generator(canvas, { width: 1080, height: 1080 });
                 generatorInstance.setUserImage(userImg);
                 generatorInstance.setOverlayImage(overlayImg);
 
-                // Tampilkan kontrol
                 uiGroup.style.display = 'flex';
                 uiGroup.innerHTML = "";
 
@@ -99,7 +111,7 @@ function processImage(file) {
                 const btnRe = document.createElement('button');
                 btnRe.className = 'btn-reset';
                 btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
-                btnRe.onclick = () => initAppLogic(); // Reset instan agar enteng
+                btnRe.onclick = () => initApp(); 
 
                 uiGroup.appendChild(btnDl);
                 uiGroup.appendChild(btnRe);
