@@ -2,14 +2,20 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Twibbon Generator</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        /* Animasi */
+        .fade-active { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #f0f2f5; margin: 0; padding: 15px;
             display: flex; justify-content: center; box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         .wrapper { width: 100%; max-width: 440px; }
@@ -21,12 +27,13 @@
         #app {
             background: #fff; padding: 15px; border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px;
+            position: relative;
         }
         
-        /* LOCK 1:1 ASPECT RATIO SEJAK AWAL */
+        /* LOCK 1:1 ASPECT RATIO - INI YANG MENCEGAH MELIPAT */
         .drop-area-square {
             width: 100%;
-            aspect-ratio: 1 / 1; /* Standar Browser Modern */
+            aspect-ratio: 1 / 1; 
             background: #fafafa;
             border: 2px dashed #d1d8e0;
             border-radius: 12px;
@@ -35,30 +42,15 @@
             justify-content: center;
             cursor: pointer;
             position: relative;
-            overflow: hidden;
             box-sizing: border-box;
-        }
-
-        /* Fallback untuk browser yang tidak support aspect-ratio */
-        @supports not (aspect-ratio: 1/1) {
-            .drop-area-square {
-                padding-top: 100%;
-                height: 0;
-            }
-            .status-overlay {
-                position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-                justify-content: center;
-            }
+            overflow: hidden;
         }
         
-        .drop-area-square.no-border { border: none !important; background: #000; }
+        .drop-area-square.no-border { border: none !important; background: #000; cursor: default; }
         
-        .status-overlay { 
-            display: flex; flex-direction: column; align-items: center; 
-            color: #888; pointer-events: none; width: 100%;
-        }
+        .status-overlay { display: flex; flex-direction: column; align-items: center; color: #888; pointer-events: none; }
         .status-overlay i { width: 44px; height: 44px; margin-bottom: 8px; color: #b2bec3; }
-        .status-overlay span { font-size: 0.9rem; font-weight: 500; padding: 0 10px; }
+        .status-overlay span { font-size: 0.9rem; font-weight: 500; }
         
         canvas { width: 100% !important; height: 100% !important; display: block; }
 
@@ -74,36 +66,38 @@
         .article-section { 
             text-align: left; line-height: 1.6; color: #2d3436; 
             background: #fff; padding: 20px; border-radius: 15px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03); 
         }
+        .article-section h2 { font-size: 1.2rem; margin-top: 0; font-weight: 800; }
+        .article-section ul { padding-left: 20px; margin: 10px 0 0 0; font-size: 0.9rem; }
+        .article-section li { margin-bottom: 5px; }
 
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        /* Fade In Effect */
-        .fade-in { animation: fadeIn 0.3s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 <div class="wrapper">
     <div class="header-identity">
-        <h1 id="title-text"></h1>
-        <p id="subtitle-text"></p>
+        <h1 id="title-text">Twibbon</h1>
+        <p id="subtitle-text">Mohon tunggu...</p>
     </div>
 
     <div id="app">
-        <!-- DROP AREA STANDBY DISINI (TIDAK AKAN MELIPAT) -->
-        <div id="drop-zone" class="drop-area-square">
-            <div class="status-overlay" id="status-content">
-                <i data-lucide="image-plus"></i>
-                <span id="status-text">Memuat sistem...</span>
+        <!-- Struktur Utama Langsung di HTML agar layout stabil -->
+        <div id="dynamic-content">
+            <div class="drop-area-square" id="drop-zone">
+                <div class="status-overlay" id="status-ui">
+                    <i data-lucide="loader-2" class="spin"></i>
+                    <span>Memuat Konfigurasi...</span>
+                </div>
             </div>
-        </div>
-        
-        <input type="file" id="file-input" accept="image/*" style="display: none;">
-        
-        <div class="btn-group" id="ui-group">
-            <!-- Tombol disisipkan via JS -->
+            
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
+            
+            <div class="btn-group" id="ui-group">
+                <!-- Tombol Muncul Setelah Gambar Diproses -->
+            </div>
         </div>
     </div>
 
@@ -111,12 +105,12 @@
         <h2>Instruksi</h2>
         <ul>
             <li>Klik kotak untuk unggah foto.</li>
-            <li>Geser/Cubit foto untuk mengatur posisi.</li>
+            <li>Geser dengan 1 jari untuk mengatur posisi.</li>
+            <li>Cubit (Pinch) untuk memperbesar/kecil.</li>
             <li>Klik Unduh jika sudah selesai.</li>
         </ul>
     </div>
 </div>
-
 <script src="src/js/index.js"></script>
 <script src="src/js/app.js"></script>
 </body>
