@@ -1,86 +1,58 @@
 let config;
 let generatorInstance;
 
+// Ambil elemen dari DOM sekali saja
+const dropZone = document.getElementById('drop-zone');
+const statusText = document.getElementById('status-text');
+const statusContent = document.getElementById('status-content');
+const fileInput = document.getElementById('file-input');
+const uiGroup = document.getElementById('ui-group');
+const titleText = document.getElementById('title-text');
+const subtitleText = document.getElementById('subtitle-text');
+
 addEventListener('load', function() {  
     fetch('config/config.json')
         .then(res => res.json())
         .then(json => {
             config = json;
-            document.getElementById('title-text').textContent = config.appTitle;
-            document.getElementById('subtitle-text').textContent = config.appSubtitle;
-            initApp(true);
+            titleText.textContent = config.appTitle;
+            subtitleText.textContent = config.appSubtitle;
+            initApp();
         })
         .catch(err => {
             console.error("Gagal memuat config:", err);
-            document.getElementById('title-text').textContent = "Kesalahan Sistem";
+            statusText.textContent = "Gagal memuat konfigurasi.";
         });
 });
 
-function initApp(firstLoad = false) {
-    const container = document.getElementById('dynamic-content');
+function initApp() {
+    // Reset Tampilan ke Awal
+    dropZone.classList.remove('no-border');
+    dropZone.classList.add('fade-in');
+    dropZone.onclick = () => fileInput.click();
     
-    // Sembunyikan konten lama
-    container.classList.remove('fade-active');
+    // Kembalikan Icon & Pesan Awal
+    statusContent.innerHTML = `
+        <i data-lucide="image-plus"></i>
+        <span>${config.messages.status.startup}</span>
+    `;
+    lucide.createIcons();
 
-    // Gunakan delay jika bukan pemuatan pertama untuk memberi waktu transisi keluar
-    const delay = firstLoad ? 0 : 200;
-
-    setTimeout(() => {
-        container.innerHTML = "";
-        
-        // Buat struktur drop area
-        const dropArea = document.createElement('div');
-        dropArea.className = 'drop-area-square';
-        dropArea.id = 'drop-zone';
-        dropArea.innerHTML = `
-            <div class="status-overlay">
-                <i data-lucide="image-plus"></i>
-                <span>${config.messages.status.startup}</span>
-            </div>
-        `;
-
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.style.display = 'none';
-
-        const btnGroup = document.createElement('div');
-        btnGroup.className = 'btn-group';
-        btnGroup.id = 'ui-group';
-        btnGroup.style.display = 'none'; // Sembunyikan sampai gambar diproses
-
-        container.appendChild(dropArea);
-        container.appendChild(fileInput);
-        container.appendChild(btnGroup);
-
-        lucide.createIcons();
-
-        // Aktifkan transisi masuk
-        requestAnimationFrame(() => {
-            container.classList.add('fade-active');
-        });
-
-        // Event Listeners
-        dropArea.onclick = () => fileInput.click();
-        fileInput.onchange = function() {
-            if(this.files && this.files[0]) {
-                processImage(this.files[0]);
-            }
-        };
-    }, delay); 
+    // Sembunyikan tombol & bersihkan input
+    uiGroup.style.display = 'none';
+    fileInput.value = "";
+    
+    fileInput.onchange = function() {
+        if(this.files && this.files[0]) processImage(this.files[0]);
+    };
 }
 
 function processImage(file) {
-    const zone = document.getElementById('drop-zone');
-    const uiGroup = document.getElementById('ui-group');
-
-    // Tampilkan status loading
-    zone.onclick = null; 
-    zone.innerHTML = `
-        <div class="status-overlay">
-            <i data-lucide="loader-2" class="spin"></i>
-            <span>${config.messages.status.processing}</span>
-        </div>
+    // Efek Loading
+    dropZone.onclick = null; 
+    statusContent.innerHTML = `
+        <i data-lucide="loader-2" class="spin"></i>
+        <span>${config.messages.status.processing}</span>
     `;
     lucide.createIcons();
 
@@ -94,44 +66,45 @@ function processImage(file) {
             overlayImg.src = config.overlaySource;
 
             overlayImg.onload = () => {
-                // Bersihkan zone dan setel mode preview
-                zone.classList.add('no-border');
-                zone.innerHTML = "";
+                // Tampilkan Canvas
+                dropZone.classList.add('no-border');
+                dropZone.innerHTML = ""; // Bersihkan overlay untuk Canvas
                 
                 const canvas = document.createElement('canvas');
-                // Canvas akan mengikuti ukuran CSS 100% dari .drop-area-square
-                zone.appendChild(canvas);
+                dropZone.appendChild(canvas);
 
-                // Inisialisasi Generator (Pastikan class Generator Anda sudah mendukung canvas ini)
                 generatorInstance = new Generator(canvas, { width: 1080, height: 1080 });
                 generatorInstance.setUserImage(userImg);
                 generatorInstance.setOverlayImage(overlayImg);
 
-                // Tampilkan tombol navigasi
-                uiGroup.style.display = 'flex';
-                uiGroup.innerHTML = "";
-
-                const btnDl = document.createElement('button');
-                btnDl.className = 'btn-download';
-                btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
-                btnDl.onclick = () => {
-                    const dataUrl = generatorInstance.render();
-                    const link = document.createElement('a');
-                    link.download = config.profilePictureName || 'twibbon.png';
-                    link.href = dataUrl;
-                    link.click();
-                };
-
-                const btnRe = document.createElement('button');
-                btnRe.className = 'btn-reset';
-                btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
-                btnRe.onclick = () => initApp(); 
-
-                uiGroup.appendChild(btnDl);
-                uiGroup.appendChild(btnRe);
-                lucide.createIcons();
+                // Tampilkan Tombol
+                renderButtons();
             };
         };
     };
     reader.readAsDataURL(file);
+}
+
+function renderButtons() {
+    uiGroup.style.display = 'flex';
+    uiGroup.innerHTML = "";
+
+    const btnDl = document.createElement('button');
+    btnDl.className = 'btn-download';
+    btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
+    btnDl.onclick = () => {
+        const link = document.createElement('a');
+        link.download = config.profilePictureName || 'result.png';
+        link.href = generatorInstance.render();
+        link.click();
+    };
+
+    const btnRe = document.createElement('button');
+    btnRe.className = 'btn-reset';
+    btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
+    btnRe.onclick = () => initApp(); 
+
+    uiGroup.appendChild(btnDl);
+    uiGroup.appendChild(btnRe);
+    lucide.createIcons();
 }
