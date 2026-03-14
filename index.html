@@ -7,9 +7,12 @@
     <title>Twibbon Generator</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Efek Transisi Halus */
-        .fade-init { opacity: 0; transition: opacity 0.5s ease; }
-        .fade-active { opacity: 1; }
+        /* Animasi muncul hanya sekali, tidak mengganggu interaksi */
+        @keyframes fadeInOnly {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in { animation: fadeInOnly 0.4s ease-out forwards; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
@@ -20,7 +23,7 @@
 
         .wrapper { width: 100%; max-width: 440px; }
         
-        .header-identity { text-align: center; margin-bottom: 15px; min-height: 55px; }
+        .header-identity { text-align: center; margin-bottom: 15px; min-height: 50px; }
         .header-identity h1 { font-size: 1.5rem; font-weight: 800; color: #2d3436; margin: 0; }
         .header-identity p { font-size: 0.9rem; color: #636e72; margin: 5px 0 0 0; }
 
@@ -29,7 +32,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px;
         }
         
-        /* Kunci Aspect Ratio di CSS agar tidak berubah bentuk saat reload */
+        /* Kunci area persegi tanpa properti 'transition' agar tidak berat saat geser */
         .drop-area-square {
             width: 100%; 
             aspect-ratio: 1 / 1; 
@@ -46,9 +49,10 @@
         .status-overlay i { width: 44px; height: 44px; margin-bottom: 8px; color: #b2bec3; }
         .status-overlay span { font-size: 0.9rem; font-weight: 500; }
         
+        /* Canvas murni tanpa transisi CSS untuk performa maksimal */
         canvas { width: 100%; height: 100%; display: block; border-radius: 8px; }
 
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; min-height: 45px; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
         button {
             flex: 1; padding: 14px; border: none; border-radius: 10px;
             font-size: 14px; font-weight: 700; cursor: pointer;
@@ -71,20 +75,17 @@
 </head>
 <body>
 <div class="wrapper">
-    <!-- Header tetap kosong sampai JS memuat config -->
     <div class="header-identity">
-        <h1 id="title-text" class="fade-init"></h1>
-        <p id="subtitle-text" class="fade-init"></p>
+        <h1 id="title-text"></h1>
+        <p id="subtitle-text"></p>
     </div>
 
     <div id="app">
-        <!-- Drop Area sudah ada di HTML agar ukuran Square tetap terjaga saat reload -->
-        <div id="dynamic-content" class="fade-init">
+        <div id="dynamic-content">
             <div class="drop-area-square" id="drop-zone">
-                <div class="status-overlay" id="status-ui">
-                    <!-- Icon placeholder sebelum config masuk -->
+                <div class="status-overlay">
                     <i data-lucide="image-plus"></i>
-                    <span id="startup-msg">Memuat...</span>
+                    <span id="startup-msg">...</span>
                 </div>
             </div>
             <input type="file" id="file-input" accept="image/*" style="display: none;">
