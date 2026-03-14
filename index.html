@@ -7,35 +7,37 @@
     <title>Twibbon Generator</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Animasi Transisi Halus */
-        .fade-init { opacity: 0; transform: scale(0.98); transition: all 0.4s ease; }
-        .fade-active { opacity: 1; transform: scale(1); }
+        /* Efek Transisi Halus */
+        .fade-init { opacity: 0; transition: opacity 0.5s ease; }
+        .fade-active { opacity: 1; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #f0f2f5; margin: 0; padding: 15px;
             display: flex; justify-content: center; box-sizing: border-box;
-            overflow-x: hidden; /* Hilangkan scrollbar horizontal */
+            overflow-x: hidden;
         }
 
         .wrapper { width: 100%; max-width: 440px; }
         
-        .header-identity { text-align: center; margin-bottom: 15px; }
+        .header-identity { text-align: center; margin-bottom: 15px; min-height: 55px; }
         .header-identity h1 { font-size: 1.5rem; font-weight: 800; color: #2d3436; margin: 0; }
         .header-identity p { font-size: 0.9rem; color: #636e72; margin: 5px 0 0 0; }
 
         #app {
             background: #fff; padding: 15px; border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px;
-            position: relative; overflow: hidden;
         }
         
+        /* Kunci Aspect Ratio di CSS agar tidak berubah bentuk saat reload */
         .drop-area-square {
-            width: 100%; aspect-ratio: 1/1; background: #fafafa;
+            width: 100%; 
+            aspect-ratio: 1 / 1; 
+            background: #fafafa;
             border: 2px dashed #d1d8e0; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; position: relative; box-sizing: border-box;
-            touch-action: none; margin: 0;
+            touch-action: none; overflow: hidden;
         }
         
         .drop-area-square.no-border { border: none !important; background: #000; cursor: default; }
@@ -46,7 +48,7 @@
         
         canvas { width: 100%; height: 100%; display: block; border-radius: 8px; }
 
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; min-height: 45px; }
         button {
             flex: 1; padding: 14px; border: none; border-radius: 10px;
             font-size: 14px; font-weight: 700; cursor: pointer;
@@ -62,22 +64,32 @@
         }
         .article-section h2 { font-size: 1.2rem; margin-top: 0; font-weight: 800; }
         .article-section ul { padding-left: 20px; margin: 10px 0 0 0; font-size: 0.9rem; }
-        .article-section li { margin-bottom: 5px; }
-
-        /* Loader Animation */
+        
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 <div class="wrapper">
+    <!-- Header tetap kosong sampai JS memuat config -->
     <div class="header-identity">
-        <h1 id="title-text"></h1>
-        <p id="subtitle-text"></p>
+        <h1 id="title-text" class="fade-init"></h1>
+        <p id="subtitle-text" class="fade-init"></p>
     </div>
 
     <div id="app">
-        <div id="dynamic-content" class="fade-init"></div>
+        <!-- Drop Area sudah ada di HTML agar ukuran Square tetap terjaga saat reload -->
+        <div id="dynamic-content" class="fade-init">
+            <div class="drop-area-square" id="drop-zone">
+                <div class="status-overlay" id="status-ui">
+                    <!-- Icon placeholder sebelum config masuk -->
+                    <i data-lucide="image-plus"></i>
+                    <span id="startup-msg">Memuat...</span>
+                </div>
+            </div>
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
+            <div class="btn-group" id="ui-group" style="display: none;"></div>
+        </div>
     </div>
 
     <div class="article-section">
