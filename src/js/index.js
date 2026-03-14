@@ -44,7 +44,7 @@ class Generator {
         this.ctx.clearRect(0, 0, this.width, this.height);
         
         // 1. Gambar Background Putih
-        this.ctx.fillStyle = "#ffffff";
+        this.ctx.fillStyle = "#fafafa";
         this.ctx.fillRect(0, 0, this.width, this.height);
 
         // 2. Gambar Foto User (dengan Transformasi)
