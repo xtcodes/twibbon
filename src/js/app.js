@@ -1,56 +1,57 @@
 let config;
 let generatorInstance;
 
-// Ambil elemen dari DOM sekali saja
-const dropZone = document.getElementById('drop-zone');
-const statusText = document.getElementById('status-text');
-const statusContent = document.getElementById('status-content');
-const fileInput = document.getElementById('file-input');
-const uiGroup = document.getElementById('ui-group');
+// Ambil elemen satu kali di awal
 const titleText = document.getElementById('title-text');
 const subtitleText = document.getElementById('subtitle-text');
+const dropZone = document.getElementById('drop-zone');
+const statusUI = document.getElementById('status-ui');
+const fileInput = document.getElementById('file-input');
+const uiGroup = document.getElementById('ui-group');
 
-addEventListener('load', function() {  
-    fetch('config/config.json')
-        .then(res => res.json())
-        .then(json => {
-            config = json;
-            titleText.textContent = config.appTitle;
-            subtitleText.textContent = config.appSubtitle;
-            initApp();
-        })
-        .catch(err => {
-            console.error("Gagal memuat config:", err);
-            statusText.textContent = "Gagal memuat konfigurasi.";
-        });
-});
+// Jalankan fetch saat script dimuat
+fetch('config/config.json')
+    .then(res => res.json())
+    .then(json => {
+        config = json;
+        titleText.textContent = config.appTitle;
+        subtitleText.textContent = config.appSubtitle;
+        initApp();
+    })
+    .catch(err => {
+        console.error("Gagal memuat config:", err);
+        statusUI.innerHTML = `<span>Gagal memuat sistem. Periksa koneksi.</span>`;
+    });
 
 function initApp() {
-    // Reset Tampilan ke Awal
+    // Kembalikan ke tampilan standby
     dropZone.classList.remove('no-border');
-    dropZone.classList.add('fade-in');
-    dropZone.onclick = () => fileInput.click();
+    dropZone.classList.add('fade-active');
     
-    // Kembalikan Icon & Pesan Awal
-    statusContent.innerHTML = `
+    statusUI.innerHTML = `
         <i data-lucide="image-plus"></i>
         <span>${config.messages.status.startup}</span>
     `;
     lucide.createIcons();
 
-    // Sembunyikan tombol & bersihkan input
     uiGroup.style.display = 'none';
-    fileInput.value = "";
+    uiGroup.innerHTML = "";
+    fileInput.value = ""; // Reset input
+
+    // Pasang event klik (Hanya setelah config siap)
+    dropZone.onclick = () => fileInput.click();
     
     fileInput.onchange = function() {
-        if(this.files && this.files[0]) processImage(this.files[0]);
+        if (this.files && this.files[0]) {
+            processImage(this.files[0]);
+        }
     };
 }
 
 function processImage(file) {
-    // Efek Loading
+    // Loading State
     dropZone.onclick = null; 
-    statusContent.innerHTML = `
+    statusUI.innerHTML = `
         <i data-lucide="loader-2" class="spin"></i>
         <span>${config.messages.status.processing}</span>
     `;
@@ -66,26 +67,27 @@ function processImage(file) {
             overlayImg.src = config.overlaySource;
 
             overlayImg.onload = () => {
-                // Tampilkan Canvas
+                // Bersihkan tampilan untuk Canvas
                 dropZone.classList.add('no-border');
-                dropZone.innerHTML = ""; // Bersihkan overlay untuk Canvas
+                dropZone.innerHTML = ""; 
                 
                 const canvas = document.createElement('canvas');
                 dropZone.appendChild(canvas);
 
+                // Inisialisasi Generator
                 generatorInstance = new Generator(canvas, { width: 1080, height: 1080 });
                 generatorInstance.setUserImage(userImg);
                 generatorInstance.setOverlayImage(overlayImg);
 
-                // Tampilkan Tombol
-                renderButtons();
+                // Munculkan Tombol
+                renderUI();
             };
         };
     };
     reader.readAsDataURL(file);
 }
 
-function renderButtons() {
+function renderUI() {
     uiGroup.style.display = 'flex';
     uiGroup.innerHTML = "";
 
@@ -93,9 +95,10 @@ function renderButtons() {
     btnDl.className = 'btn-download';
     btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
     btnDl.onclick = () => {
+        const dataUrl = generatorInstance.render();
         const link = document.createElement('a');
-        link.download = config.profilePictureName || 'result.png';
-        link.href = generatorInstance.render();
+        link.download = config.profilePictureName || 'twibbon.png';
+        link.href = dataUrl;
         link.click();
     };
 
