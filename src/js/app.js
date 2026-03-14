@@ -1,7 +1,6 @@
 let config;
 let generatorInstance;
 
-// Ambil elemen yang sudah ada di HTML
 const container = document.getElementById('dynamic-content');
 const titleText = document.getElementById('title-text');
 const subtitleText = document.getElementById('subtitle-text');
@@ -16,15 +15,14 @@ addEventListener('load', function() {
         .then(json => {
             config = json;
             
-            // Isi teks dari config
+            // Set konten teks
             titleText.textContent = config.appTitle;
             subtitleText.textContent = config.appSubtitle;
             startupMsg.textContent = config.messages.status.startup;
             
-            // Munculkan semua dengan halus setelah teks siap
-            titleText.classList.add('fade-active');
-            subtitleText.classList.add('fade-active');
-            container.classList.add('fade-active');
+            // Berikan efek fade-in hanya sekali saat pertama dimuat
+            container.classList.add('fade-in');
+            document.querySelector('.header-identity').classList.add('fade-in');
             
             lucide.createIcons();
             initAppLogic();
@@ -33,11 +31,8 @@ addEventListener('load', function() {
 });
 
 function initAppLogic() {
-    // Reset state jika dipanggil dari tombol reset
+    // Kembalikan ke keadaan awal tanpa 'transition' berat
     dropZone.classList.remove('no-border');
-    dropZone.onclick = () => fileInput.click();
-    
-    // Tampilkan kembali overlay startup
     dropZone.innerHTML = `
         <div class="status-overlay">
             <i data-lucide="image-plus"></i>
@@ -48,6 +43,7 @@ function initAppLogic() {
     
     uiGroup.style.display = 'none';
     uiGroup.innerHTML = "";
+    dropZone.onclick = () => fileInput.click();
 
     fileInput.onchange = function() {
         if(this.files && this.files[0]) processImage(this.files[0]);
@@ -55,7 +51,6 @@ function initAppLogic() {
 }
 
 function processImage(file) {
-    // Feedback proses
     dropZone.onclick = null; 
     dropZone.innerHTML = `
         <div class="status-overlay">
@@ -75,19 +70,19 @@ function processImage(file) {
             overlayImg.src = config.overlaySource;
 
             overlayImg.onload = () => {
-                // Bersihkan zone dan masukkan canvas
+                // Bersihkan zone dan pasang canvas
                 dropZone.classList.add('no-border');
                 dropZone.innerHTML = "";
                 
                 const canvas = document.createElement('canvas');
                 dropZone.appendChild(canvas);
 
-                // Jalankan Generator Interaktif
+                // Inisialisasi Generator (Interaksi harus ringan di sini)
                 generatorInstance = new Generator(canvas, { width: 1080, height: 1080 });
                 generatorInstance.setUserImage(userImg);
                 generatorInstance.setOverlayImage(overlayImg);
 
-                // Setup Tombol dengan halus
+                // Tampilkan kontrol
                 uiGroup.style.display = 'flex';
                 uiGroup.innerHTML = "";
 
@@ -104,14 +99,7 @@ function processImage(file) {
                 const btnRe = document.createElement('button');
                 btnRe.className = 'btn-reset';
                 btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
-                btnRe.onclick = () => {
-                    // Animasi transisi saat reset
-                    container.classList.remove('fade-active');
-                    setTimeout(() => {
-                        initAppLogic();
-                        container.classList.add('fade-active');
-                    }, 300);
-                }; 
+                btnRe.onclick = () => initAppLogic(); // Reset instan agar enteng
 
                 uiGroup.appendChild(btnDl);
                 uiGroup.appendChild(btnRe);
