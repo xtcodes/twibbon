@@ -6,32 +6,23 @@ addEventListener('load', function() {
         .then(res => res.json())
         .then(json => {
             config = json;
-            
-            // ISI HEADER DARI JSON DENGAN ANIMASI
-            const titleEl = document.getElementById('title-text');
-            const subEl = document.getElementById('subtitle-text');
-            
-            titleEl.textContent = config.appTitle;
-            subEl.textContent = config.appSubtitle;
-            
-            document.getElementById('header-box').classList.add('fade-in');
-            
-            initApp();
+            document.getElementById('title-text').textContent = config.appTitle;
+            document.getElementById('subtitle-text').textContent = config.appSubtitle;
+            initApp(true); // true = pemuatan pertama (tanpa delay reset)
         })
         .catch(err => console.error("Gagal memuat config:", err));
 });
 
-function initApp() {
+function initApp(firstLoad = false) {
     const container = document.getElementById('dynamic-content');
     
-    // Fade Out konten lama sebelum diganti
-    container.style.opacity = "0";
+    // 1. Sembunyikan konten lama dengan halus
+    container.classList.remove('fade-active');
 
     setTimeout(() => {
         container.innerHTML = "";
-        container.className = "fade-in"; // Terapkan efek fade-in
         
-        // Buat Drop Area
+        // 2. Siapkan elemen baru
         const dropArea = document.createElement('div');
         dropArea.className = 'drop-area-square';
         dropArea.id = 'drop-zone';
@@ -42,13 +33,11 @@ function initApp() {
             </div>
         `;
 
-        // Input file tersembunyi
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = 'image/*';
         fileInput.style.display = 'none';
 
-        // Group Tombol (tersembunyi diawal)
         const btnGroup = document.createElement('div');
         btnGroup.className = 'btn-group';
         btnGroup.id = 'ui-group';
@@ -59,29 +48,28 @@ function initApp() {
         container.appendChild(btnGroup);
 
         lucide.createIcons();
-        container.style.opacity = "1";
 
-        // Event Klik
+        // 3. Tampilkan kembali dengan efek Fade In
+        requestAnimationFrame(() => {
+            container.classList.add('fade-active');
+        });
+
         dropArea.onclick = () => fileInput.click();
-
         fileInput.onchange = function() {
-            if(this.files && this.files[0]) {
-                processImage(this.files[0]);
-            }
+            if(this.files && this.files[0]) processImage(this.files[0]);
         };
-    }, 100); 
+    }, firstLoad ? 0 : 200); 
 }
 
 function processImage(file) {
     const zone = document.getElementById('drop-zone');
     const uiGroup = document.getElementById('ui-group');
 
-    // Matikan klik dan tampilkan loading
+    // Feedback saat memproses
     zone.onclick = null; 
-    zone.style.opacity = "0.6";
     zone.innerHTML = `
         <div class="status-overlay">
-            <i data-lucide="loader-2" class="animate-spin"></i>
+            <i data-lucide="loader-2" class="spin"></i>
             <span>${config.messages.status.processing}</span>
         </div>
     `;
@@ -97,26 +85,19 @@ function processImage(file) {
             overlayImg.src = config.overlaySource;
 
             overlayImg.onload = () => {
-                // Tampilkan canvas dengan transisi halus
-                zone.style.opacity = "1";
                 zone.classList.add('no-border');
                 zone.innerHTML = "";
                 
                 const canvas = document.createElement('canvas');
-                canvas.className = 'fade-in';
                 zone.appendChild(canvas);
 
-                // Jalankan Generator
                 generatorInstance = new Generator(canvas, { width: 1080, height: 1080 });
                 generatorInstance.setUserImage(userImg);
                 generatorInstance.setOverlayImage(overlayImg);
 
-                // Tampilkan Kontrol
                 uiGroup.style.display = 'flex';
-                uiGroup.className = 'btn-group fade-in';
                 uiGroup.innerHTML = "";
 
-                // Tombol Unduh
                 const btnDl = document.createElement('button');
                 btnDl.className = 'btn-download';
                 btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
@@ -127,7 +108,6 @@ function processImage(file) {
                     link.click();
                 };
 
-                // Tombol Reset
                 const btnRe = document.createElement('button');
                 btnRe.className = 'btn-reset';
                 btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
