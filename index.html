@@ -7,17 +7,15 @@
     <title>Twibbon Generator</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+        /* Animasi Transisi Halus */
+        .fade-init { opacity: 0; transform: scale(0.98); transition: all 0.4s ease; }
+        .fade-active { opacity: 1; transform: scale(1); }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #f0f2f5; margin: 0; padding: 15px;
-            display: flex; justify-content: center; overflow-x: hidden;
+            display: flex; justify-content: center; box-sizing: border-box;
+            overflow-x: hidden; /* Hilangkan scrollbar horizontal */
         }
 
         .wrapper { width: 100%; max-width: 440px; }
@@ -29,40 +27,26 @@
         #app {
             background: #fff; padding: 15px; border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px;
+            position: relative; overflow: hidden;
         }
-
-        /* KUNCI UTAMA: Kotak sejak awal di CSS */
+        
         .drop-area-square {
-            width: 100%;
-            aspect-ratio: 1 / 1; 
-            background: #fafafa;
-            border: 2px dashed #d1d8e0;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            touch-action: none; /* Mencegah geser layar saat zoom gambar */
+            width: 100%; aspect-ratio: 1/1; background: #fafafa;
+            border: 2px dashed #d1d8e0; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; position: relative; box-sizing: border-box;
+            touch-action: none; margin: 0;
         }
         
-        .drop-area-square.no-border { border: none !important; background: #000; }
+        .drop-area-square.no-border { border: none !important; background: #000; cursor: default; }
         
-        canvas { 
-            width: 100% !important; 
-            height: 100% !important; 
-            display: block; 
-            touch-action: none;
-        }
-
-        .status-overlay { 
-            display: flex; flex-direction: column; align-items: center; 
-            color: #888; pointer-events: none; 
-        }
+        .status-overlay { display: flex; flex-direction: column; align-items: center; color: #888; pointer-events: none; }
         .status-overlay i { width: 44px; height: 44px; margin-bottom: 8px; color: #b2bec3; }
+        .status-overlay span { font-size: 0.9rem; font-weight: 500; }
+        
+        canvas { width: 100%; height: 100%; display: block; border-radius: 8px; }
 
-        .btn-group { display: none; gap: 10px; margin-top: 15px; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
         button {
             flex: 1; padding: 14px; border: none; border-radius: 10px;
             font-size: 14px; font-weight: 700; cursor: pointer;
@@ -74,8 +58,13 @@
         .article-section { 
             text-align: left; line-height: 1.6; color: #2d3436; 
             background: #fff; padding: 20px; border-radius: 15px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03); 
         }
+        .article-section h2 { font-size: 1.2rem; margin-top: 0; font-weight: 800; }
+        .article-section ul { padding-left: 20px; margin: 10px 0 0 0; font-size: 0.9rem; }
+        .article-section li { margin-bottom: 5px; }
 
+        /* Loader Animation */
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
@@ -83,29 +72,12 @@
 <body>
 <div class="wrapper">
     <div class="header-identity">
-        <h1 id="title-text">Loading...</h1>
-        <p id="subtitle-text">Harap tunggu</p>
+        <h1 id="title-text"></h1>
+        <p id="subtitle-text"></p>
     </div>
 
     <div id="app">
-        <!-- Area drop sudah ada di HTML, tidak akan berubah bentuk -->
-        <div id="drop-zone" class="drop-area-square">
-            <div id="status-container" class="status-overlay">
-                <i data-lucide="image-plus"></i>
-                <span id="status-text">Klik untuk Unggah Foto</span>
-            </div>
-        </div>
-
-        <input type="file" id="file-input" accept="image/*" style="display: none;">
-
-        <div id="ui-group" class="btn-group">
-            <button id="btn-dl" class="btn-download">
-                <i data-lucide="download"></i> <span id="text-dl">Unduh</span>
-            </button>
-            <button id="btn-re" class="btn-reset">
-                <i data-lucide="refresh-cw"></i> <span id="text-re">Ganti Foto</span>
-            </button>
-        </div>
+        <div id="dynamic-content" class="fade-init"></div>
     </div>
 
     <div class="article-section">
@@ -118,7 +90,6 @@
         </ul>
     </div>
 </div>
-
 <script src="src/js/index.js"></script>
 <script src="src/js/app.js"></script>
 </body>
