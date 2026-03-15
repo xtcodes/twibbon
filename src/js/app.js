@@ -1,15 +1,15 @@
-//App.js
 let config;
 let generatorInstance;
 
-addEventListener('load', function() {  
+// Gunakan DOMContentLoaded agar lebih stabil daripada load
+document.addEventListener('DOMContentLoaded', function() {  
     fetch('config/config.json')
         .then(res => res.json())
         .then(json => {
             config = json;
             document.getElementById('title-text').textContent = config.appTitle;
             document.getElementById('subtitle-text').textContent = config.appSubtitle;
-            initApp(true); // true = pemuatan pertama (tanpa delay reset)
+            initApp(true); 
         })
         .catch(err => console.error("Gagal memuat config:", err));
 });
@@ -17,7 +17,7 @@ addEventListener('load', function() {
 function initApp(firstLoad = false) {
     const container = document.getElementById('dynamic-content');
     
-    // 1. Sembunyikan konten lama dengan halus
+    // 1. Sembunyikan konten lama
     container.classList.remove('fade-active');
 
     setTimeout(() => {
@@ -51,8 +51,11 @@ function initApp(firstLoad = false) {
         lucide.createIcons();
 
         // 3. Tampilkan kembali dengan efek Fade In
+        // Paksa browser menghitung layout (reflow) sebelum animasi
         requestAnimationFrame(() => {
-            container.classList.add('fade-active');
+            requestAnimationFrame(() => {
+                container.classList.add('fade-active');
+            });
         });
 
         dropArea.onclick = () => fileInput.click();
@@ -66,7 +69,6 @@ function processImage(file) {
     const zone = document.getElementById('drop-zone');
     const uiGroup = document.getElementById('ui-group');
 
-    // Feedback saat memproses
     zone.onclick = null; 
     zone.innerHTML = `
         <div class="status-overlay">
@@ -92,6 +94,7 @@ function processImage(file) {
                 const canvas = document.createElement('canvas');
                 zone.appendChild(canvas);
 
+                // Inisialisasi generator dari index.js
                 generatorInstance = new Generator(canvas, { width: 1080, height: 1080 });
                 generatorInstance.setUserImage(userImg);
                 generatorInstance.setOverlayImage(overlayImg);
@@ -104,7 +107,7 @@ function processImage(file) {
                 btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
                 btnDl.onclick = () => {
                     const link = document.createElement('a');
-                    link.download = config.profilePictureName;
+                    link.download = config.profilePictureName || 'twibbon.png';
                     link.href = generatorInstance.render();
                     link.click();
                 };
