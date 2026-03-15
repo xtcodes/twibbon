@@ -1,43 +1,78 @@
+//App.js
 let config;
 let generatorInstance;
 
-// Ambil elemen yang sudah ada di HTML
-const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
-const statusContainer = document.getElementById('status-container');
-const statusText = document.getElementById('status-text');
-const uiGroup = document.getElementById('ui-group');
-const btnDl = document.getElementById('btn-dl');
-const btnRe = document.getElementById('btn-re');
-
-document.addEventListener('DOMContentLoaded', () => {
+addEventListener('load', function() {  
     fetch('config/config.json')
         .then(res => res.json())
         .then(json => {
             config = json;
             document.getElementById('title-text').textContent = config.appTitle;
             document.getElementById('subtitle-text').textContent = config.appSubtitle;
-            statusText.textContent = config.messages.status.startup;
-            document.getElementById('text-dl').textContent = config.messages.buttons.download;
-            document.getElementById('text-re').textContent = config.messages.buttons.newImage;
-            lucide.createIcons();
+            initApp(true); // true = pemuatan pertama (tanpa delay reset)
         })
-        .catch(err => console.error("Config Error:", err));
+        .catch(err => console.error("Gagal memuat config:", err));
 });
 
-dropZone.onclick = () => fileInput.click();
+function initApp(firstLoad = false) {
+    const container = document.getElementById('dynamic-content');
+    
+    // 1. Sembunyikan konten lama dengan halus
+    container.classList.remove('fade-active');
 
-fileInput.onchange = function(e) {
-    if (this.files && this.files[0]) {
-        processImage(this.files[0]);
-    }
-};
+    setTimeout(() => {
+        container.innerHTML = "";
+        
+        // 2. Siapkan elemen baru
+        const dropArea = document.createElement('div');
+        dropArea.className = 'drop-area-square';
+        dropArea.id = 'drop-zone';
+        dropArea.innerHTML = `
+            <div class="status-overlay">
+                <i data-lucide="image-plus"></i>
+                <span>${config.messages.status.startup}</span>
+            </div>
+        `;
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'btn-group';
+        btnGroup.id = 'ui-group';
+        btnGroup.style.display = 'none';
+
+        container.appendChild(dropArea);
+        container.appendChild(fileInput);
+        container.appendChild(btnGroup);
+
+        lucide.createIcons();
+
+        // 3. Tampilkan kembali dengan efek Fade In
+        requestAnimationFrame(() => {
+            container.classList.add('fade-active');
+        });
+
+        dropArea.onclick = () => fileInput.click();
+        fileInput.onchange = function() {
+            if(this.files && this.files[0]) processImage(this.files[0]);
+        };
+    }, firstLoad ? 0 : 200); 
+}
 
 function processImage(file) {
-    // Tampilkan loader
-    statusContainer.innerHTML = `
-        <i data-lucide="loader-2" class="spin"></i>
-        <span>${config.messages.status.processing}</span>
+    const zone = document.getElementById('drop-zone');
+    const uiGroup = document.getElementById('ui-group');
+
+    // Feedback saat memproses
+    zone.onclick = null; 
+    zone.innerHTML = `
+        <div class="status-overlay">
+            <i data-lucide="loader-2" class="spin"></i>
+            <span>${config.messages.status.processing}</span>
+        </div>
     `;
     lucide.createIcons();
 
@@ -51,35 +86,39 @@ function processImage(file) {
             overlayImg.src = config.overlaySource;
 
             overlayImg.onload = () => {
-                // Bersihkan isi dropZone dan pasang canvas
-                dropZone.innerHTML = "";
-                dropZone.classList.add('no-border');
+                zone.classList.add('no-border');
+                zone.innerHTML = "";
                 
                 const canvas = document.createElement('canvas');
-                canvas.oncontextmenu = (ev) => ev.preventDefault(); // Matikan klik kanan biar gak ganggu drag
-                dropZone.appendChild(canvas);
+                zone.appendChild(canvas);
 
-                // Inisialisasi generator
                 generatorInstance = new Generator(canvas, { width: 1080, height: 1080 });
                 generatorInstance.setUserImage(userImg);
                 generatorInstance.setOverlayImage(overlayImg);
 
-                // Tampilkan tombol
                 uiGroup.style.display = 'flex';
+                uiGroup.innerHTML = "";
+
+                const btnDl = document.createElement('button');
+                btnDl.className = 'btn-download';
+                btnDl.innerHTML = `<i data-lucide="download"></i> ${config.messages.buttons.download}`;
+                btnDl.onclick = () => {
+                    const link = document.createElement('a');
+                    link.download = config.profilePictureName;
+                    link.href = generatorInstance.render();
+                    link.click();
+                };
+
+                const btnRe = document.createElement('button');
+                btnRe.className = 'btn-reset';
+                btnRe.innerHTML = `<i data-lucide="refresh-cw"></i> ${config.messages.buttons.newImage}`;
+                btnRe.onclick = () => initApp(); 
+
+                uiGroup.appendChild(btnDl);
+                uiGroup.appendChild(btnRe);
+                lucide.createIcons();
             };
         };
     };
     reader.readAsDataURL(file);
 }
-
-btnDl.onclick = () => {
-    const link = document.createElement('a');
-    link.download = config.profilePictureName || 'twibbon.png';
-    link.href = generatorInstance.render();
-    link.click();
-};
-
-btnRe.onclick = () => {
-    // Reset ke kondisi awal tanpa reload halaman (cepat & stabil)
-    location.reload(); 
-};
